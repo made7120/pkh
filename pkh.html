@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Rekomendasi PKH Forward Chaining</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Aplikasi Rekomendasi PKH</h1>
+          <p class="text-slate-600 mt-2">Sistem pakar berbasis AI simbolik dengan metode forward chaining untuk rekomendasi kelayakan awal calon penerima PKH.</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <label class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold cursor-pointer hover:bg-blue-700">
+            Upload Excel
+            <input id="fileInput" type="file" accept=".xlsx,.xls" class="hidden" />
+          </label>
+          <button id="btnSample" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800">Data Contoh</button>
+          <button id="btnExport" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-40" disabled>Export CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Total Data</p>
+        <h2 id="totalData" class="text-3xl font-bold mt-1">0</h2>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Layak Diusulkan</p>
+        <h2 id="totalLayak" class="text-3xl font-bold mt-1 text-emerald-600">0</h2>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Perlu Verifikasi</p>
+        <h2 id="totalVerifikasi" class="text-3xl font-bold mt-1 text-amber-600">0</h2>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Tidak Prioritas</p>
+        <h2 id="totalTidak" class="text-3xl font-bold mt-1 text-rose-600">0</h2>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <h2 class="text-lg font-bold mb-3">Basis Aturan Forward Chaining</h2>
+        <div id="ruleBox" class="space-y-3 text-sm"></div>
+      </div>
+      <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Hasil Rekomendasi</h2>
+            <p class="text-sm text-slate-500">Keputusan bersifat rekomendasi awal dan tetap membutuhkan verifikasi petugas.</p>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" class="px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <select id="filterStatus" class="px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="SEMUA">Semua Status</option>
+              <option value="Layak Diusulkan">Layak Diusulkan</option>
+              <option value="Perlu Verifikasi">Perlu Verifikasi</option>
+              <option value="Tidak Prioritas">Tidak Prioritas</option>
+            </select>
+          </div>
+        </div>
+        <div class="overflow-auto rounded-xl border border-slate-200">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700 sticky top-0">
+              <tr>
+                <th class="text-left px-3 py-3 font-semibold">No</th>
+                <th class="text-left px-3 py-3 font-semibold">Nama</th>
+                <th class="text-left px-3 py-3 font-semibold">NIK</th>
+                <th class="text-left px-3 py-3 font-semibold">RT</th>
+                <th class="text-left px-3 py-3 font-semibold">Skor</th>
+                <th class="text-left px-3 py-3 font-semibold">Komponen</th>
+                <th class="text-left px-3 py-3 font-semibold">Rekomendasi</th>
+                <th class="text-left px-3 py-3 font-semibold">Alasan</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody" class="divide-y divide-slate-200 bg-white"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <h2 class="text-lg font-bold mb-3">Catatan Penggunaan</h2>
+      <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+        <li>File Excel harus memiliki kolom NIK, NAMA, UMUR, PENGHASILAN, TANGGUNGAN KELUARGA, KONDISI RUMAH, ASET PRODUKTIF, KENDARAAN, dan RT.</li>
+        <li>Kolom tambahan yang disarankan: STATUS DTKS, IBU HAMIL, ANAK 0-6, ANAK SD, ANAK SMP, ANAK SMA, LANSIA, dan DISABILITAS BERAT.</li>
+        <li>Aplikasi ini tidak menggantikan keputusan resmi. Sistem hanya membantu skrining awal berbasis aturan.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const rules = [
+      { id: "R1", text: "IF penghasilan rendah THEN fakta ekonomi rentan", weight: 30 },
+      { id: "R2", text: "IF rumah tidak layak THEN fakta hunian rentan", weight: 20 },
+      { id: "R3", text: "IF tanggungan keluarga banyak THEN fakta beban keluarga tinggi", weight: 15 },
+      { id: "R4", text: "IF tidak punya aset produktif THEN fakta aset rendah", weight: 15 },
+      { id: "R5", text: "IF usia minimal 60 tahun THEN komponen PKH lansia", weight: 20 },
+      { id: "R6", text: "IF ada ibu hamil, balita, anak sekolah, lansia, atau disabilitas berat THEN punya komponen PKH", weight: 0 },
+      { id: "R7", text: "IF skor tinggi AND punya komponen PKH THEN layak diusulkan", weight: 0 },
+      { id: "R8", text: "IF kendaraan mobil AND rumah layak AND penghasilan tinggi THEN tidak prioritas", weight: -25 }
+    ];
+
+    let results = [];
+
+    const el = id => document.getElementById(id);
+
+    function normalizeKey(value) {
+      return String(value ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .toUpperCase();
+    }
+
+    function clean(value) {
+      return String(value ?? "").trim();
+    }
+
+    function yes(value) {
+      const text = clean(value).toUpperCase();
+      return ["YA", "IYA", "ADA", "TERDAFTAR", "TRUE", "1"].some(v => text.includes(v));
+    }
+
+    function parseAge(value) {
+      const match = clean(value).match(/\d+/);
+      return match ? Number(match[0]) : 0;
+    }
+
+    function parseNumber(value) {
+      const text = clean(value).replace(/[^0-9]/g, "");
+      return text ? Number(text) : 0;
+    }
+
+    function parseIncome(value) {
+      const text = clean(value).toUpperCase();
+      const number = parseNumber(text);
+      if (!number) return 0;
+      if (text.includes("2.000.000") || text.includes("2000000")) return text.includes(">") ? 2500000 : 2000000;
+      if (text.includes("1.000.000") || text.includes("1000000")) return text.includes(">") ? 1500000 : 1000000;
+      if (text.includes("800") && text.includes("<")) return 799999;
+      return number;
+    }
+
+    function getField(row, keys) {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
+      }
+      return "";
+    }
+
+    function mapRows(rows) {
+      const headerIndex = rows.findIndex(row => row.some(cell => normalizeKey(cell) === "NIK") && row.some(cell => normalizeKey(cell) === "NAMA"));
+      if (headerIndex < 0) throw new Error("Header NIK dan NAMA tidak ditemukan.");
+      const headers = rows[headerIndex].map(normalizeKey);
+      return rows.slice(headerIndex + 1)
+        .filter(row => row.some(cell => clean(cell) !== ""))
+        .map(row => {
+          const object = {};
+          headers.forEach((header, index) => object[header] = row[index] ?? "");
+          return object;
+        });
+    }
+
+    function infer(row, index) {
+      const nama = getField(row, ["NAMA"]);
+      const nik = getField(row, ["NIK"]);
+      const rt = getField(row, ["RT"]);
+      const umur = parseAge(getField(row, ["UMUR", "USIA"]));
+      const penghasilanText = getField(row, ["PENGHASILAN", "PENDAPATAN"]);
+      const penghasilan = parseIncome(penghasilanText);
+      const tanggungan = parseNumber(getField(row, ["TANGGUNGANKELUARGA", "JUMLAHTANGGUNGAN"]));
+      const kondisiRumah = clean(getField(row, ["KONDISIRUMAH"])).toUpperCase();
+      const aset = clean(getField(row, ["ASETPRODUKTIF", "ASET"])).toUpperCase();
+      const kendaraan = clean(getField(row, ["KENDARAAN"])).toUpperCase();
+      const statusDtks = clean(getField(row, ["STATUSDTKS", "DTKS"])).toUpperCase();
+
+      const facts = [];
+      const components = [];
+      let score = 0;
+
+      if (penghasilan > 0 && penghasilan <= 800000) {
+        score += 30;
+        facts.push("penghasilan rendah");
+      } else if (penghasilan > 0 && penghasilan <= 1000000) {
+        score += 20;
+        facts.push("penghasilan cukup rendah");
+      } else if (penghasilan >= 2000000) {
+        facts.push("penghasilan tinggi");
+      }
+
+      if (kondisiRumah.includes("TIDAK")) {
+        score += 20;
+        facts.push("rumah tidak layak");
+      }
+
+      if (tanggungan >= 4) {
+        score += 15;
+        facts.push("tanggungan keluarga banyak");
+      } else if (tanggungan >= 3) {
+        score += 10;
+        facts.push("tanggungan keluarga sedang");
+      }
+
+      if (aset.includes("TIDAK") || aset === "" || aset.includes("TIDAK ADA")) {
+        score += 15;
+        facts.push("tidak punya aset produktif");
+      }
+
+      if (kendaraan.includes("SEPEDA") && !kendaraan.includes("MOTOR") && !kendaraan.includes("MOBIL")) {
+        score += 10;
+        facts.push("akses kendaraan terbatas");
+      }
+
+      if (umur >= 60) {
+        score += 20;
+        components.push("Lansia");
+        facts.push("usia lansia");
+      }
+
+      const ibuHamil = yes(getField(row, ["IBUHAMIL", "HAMIL"]));
+      const balita = yes(getField(row, ["ANAK06", "ANAK0SAMPAI6", "BALITA"]));
+      const anakSd = yes(getField(row, ["ANAKSD", "SD"]));
+      const anakSmp = yes(getField(row, ["ANAKSMP", "SMP"]));
+      const anakSma = yes(getField(row, ["ANAKSMA", "SMA"]));
+      const disabilitas = yes(getField(row, ["DISABILITASBERAT", "DISABILITAS"]));
+
+      if (ibuHamil) components.push("Ibu Hamil");
+      if (balita) components.push("Balita");
+      if (anakSd || anakSmp || anakSma) components.push("Pendidikan");
+      if (disabilitas) components.push("Disabilitas Berat");
+
+      const punyaKomponen = components.length > 0;
+      const dtksTidakTerdaftar = statusDtks && !yes(statusDtks);
+      const kendaraanMahal = kendaraan.includes("MOBIL");
+      const rumahLayak = kondisiRumah === "LAYAK";
+
+      if (kendaraanMahal && rumahLayak && penghasilan >= 2000000) {
+        score -= 25;
+        facts.push("indikasi ekonomi lebih kuat");
+      }
+
+      score = Math.max(0, Math.min(100, score));
+
+      let recommendation = "Tidak Prioritas";
+      if (dtksTidakTerdaftar) {
+        recommendation = "Perlu Verifikasi";
+        facts.push("status DTKS belum memenuhi syarat");
+      } else if (score >= 60 && punyaKomponen) {
+        recommendation = "Layak Diusulkan";
+      } else if (score >= 50 || (score >= 40 && punyaKomponen)) {
+        recommendation = "Perlu Verifikasi";
+      }
+
+      if (!punyaKomponen) {
+        facts.push("komponen PKH belum teridentifikasi pada data");
+      }
+
+      return {
+        no: index + 1,
+        nama,
+        nik,
+        rt,
+        umur,
+        penghasilanText,
+        tanggungan,
+        score,
+        components: components.length ? components.join(", ") : "Belum teridentifikasi",
+        recommendation,
+        reason: facts.join("; ") || "data belum cukup"
+      };
+    }
+
+    function statusClass(status) {
+      if (status === "Layak Diusulkan") return "bg-emerald-100 text-emerald-700";
+      if (status === "Perlu Verifikasi") return "bg-amber-100 text-amber-700";
+      return "bg-rose-100 text-rose-700";
+    }
+
+    function renderRules() {
+      el("ruleBox").innerHTML = rules.map(rule => `
+        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-900">${rule.id}</span>
+            <span class="text-xs rounded-full px-2 py-1 bg-white border border-slate-200">Bobot ${rule.weight}</span>
+          </div>
+          <p class="text-slate-600 mt-2">${rule.text}</p>
+        </div>
+      `).join("");
+    }
+
+    function renderTable() {
+      const query = el("searchInput").value.toLowerCase();
+      const filter = el("filterStatus").value;
+      const filtered = results.filter(item => {
+        const matchQuery = [item.nama, item.nik, item.rt, item.recommendation].join(" ").toLowerCase().includes(query);
+        const matchStatus = filter === "SEMUA" || item.recommendation === filter;
+        return matchQuery && matchStatus;
+      });
+
+      el("resultBody").innerHTML = filtered.map(item => `
+        <tr class="hover:bg-slate-50 align-top">
+          <td class="px-3 py-3">${item.no}</td>
+          <td class="px-3 py-3 font-semibold whitespace-nowrap">${item.nama}</td>
+          <td class="px-3 py-3 whitespace-nowrap">${item.nik}</td>
+          <td class="px-3 py-3">${item.rt}</td>
+          <td class="px-3 py-3 font-bold">${item.score}</td>
+          <td class="px-3 py-3">${item.components}</td>
+          <td class="px-3 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass(item.recommendation)}">${item.recommendation}</span></td>
+          <td class="px-3 py-3 min-w-[260px] text-slate-600">${item.reason}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="8" class="px-3 py-6 text-center text-slate-500">Belum ada data yang ditampilkan.</td></tr>`;
+    }
+
+    function renderSummary() {
+      el("totalData").textContent = results.length;
+      el("totalLayak").textContent = results.filter(item => item.recommendation === "Layak Diusulkan").length;
+      el("totalVerifikasi").textContent = results.filter(item => item.recommendation === "Perlu Verifikasi").length;
+      el("totalTidak").textContent = results.filter(item => item.recommendation === "Tidak Prioritas").length;
+      el("btnExport").disabled = results.length === 0;
+    }
+
+    function runInference(dataRows) {
+      results = dataRows.map(infer);
+      renderSummary();
+      renderTable();
+    }
+
+    function readExcel(file) {
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const workbook = XLSX.read(new Uint8Array(event.target.result), { type: "array" });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+          const dataRows = mapRows(rows);
+          runInference(dataRows);
+        } catch (error) {
+          alert(error.message || "File Excel gagal dibaca.");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function exportCsv() {
+      const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Skor", "Komponen", "Rekomendasi", "Alasan"];
+      const rows = results.map(item => [
+        item.no,
+        item.nama,
+        item.nik,
+        item.rt,
+        item.umur,
+        item.penghasilanText,
+        item.tanggungan,
+        item.score,
+        item.components,
+        item.recommendation,
+        item.reason
+      ]);
+      const csv = [headers, ...rows]
+        .map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "hasil_rekomendasi_pkh.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function loadSample() {
+      const sample = [
+        { NAMA: "SUMIATUN", NIK: "1807134707530002", UMUR: "72 thn", PENGHASILAN: "< Rp.800,000", TANGGUNGANKELUARGA: "2", KONDISIRUMAH: "TIDAK LAYAK", ASETPRODUKTIF: "SAWAH", KENDARAAN: "SEPEDA", RT: "2" },
+        { NAMA: "AKHMAD MUKHLISIN", NIK: "1807080510920003", UMUR: "33 thn", PENGHASILAN: "> Rp 1.000.000", TANGGUNGANKELUARGA: "4", KONDISIRUMAH: "LAYAK", ASETPRODUKTIF: "TIDAK ADA", KENDARAAN: "MOTOR", RT: "2" },
+        { NAMA: "SUKARMAN HADI PRASETYO", NIK: "1802231103930001", UMUR: "32 thn", PENGHASILAN: "> Rp 2.000.000", TANGGUNGANKELUARGA: "1", KONDISIRUMAH: "LAYAK", ASETPRODUKTIF: "SAWAH", KENDARAAN: "MOTOR, MOBIL", RT: "2" }
+      ];
+      runInference(sample);
+    }
+
+    el("fileInput").addEventListener("change", event => {
+      const file = event.target.files[0];
+      if (file) readExcel(file);
+    });
+
+    el("searchInput").addEventListener("input", renderTable);
+    el("filterStatus").addEventListener("change", renderTable);
+    el("btnExport").addEventListener("click", exportCsv);
+    el("btnSample").addEventListener("click", loadSample);
+
+    renderRules();
+    renderSummary();
+    renderTable();
+  </script>
+</body>
+</html>
