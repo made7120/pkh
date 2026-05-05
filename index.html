@@ -8,7 +8,7 @@
 </head>
 <body class="bg-slate-100 text-slate-900">
   <div class="min-h-screen flex">
-    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 bg-slate-950 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 bg-slate-950 text-white transform -translate-x-full lg:translate-x-0 transition-all duration-300 flex flex-col overflow-hidden">
       <div class="p-5 border-b border-slate-800">
         <h1 class="text-xl font-bold">PKH Expert System</h1>
         <p class="text-sm text-slate-400 mt-1">Forward Chaining AI</p>
@@ -46,14 +46,13 @@
     <div class="flex-1 lg:ml-0 min-w-0">
       <header class="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-3 lg:px-6 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <button id="btnMenu" class="lg:hidden px-3 py-2 rounded-xl bg-slate-900 text-white">☰</button>
+          <button id="btnMenu" class="px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800">☰</button>
           <div>
             <h2 id="pageTitle" class="text-lg md:text-xl font-bold">Dashboard</h2>
             <p id="pageSubtitle" class="text-xs md:text-sm text-slate-500">Informasi aplikasi rekomendasi PKH</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button id="btnSample" class="hidden sm:inline-flex px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800">Isi Contoh</button>
           <button id="btnExport" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-40" disabled>Export CSV</button>
         </div>
       </header>
@@ -366,14 +365,48 @@
       return map[value] || value;
     }
 
+    function isDesktop() {
+      return window.innerWidth >= 1024;
+    }
+
     function closeSidebar() {
-      el("sidebar").classList.add("-translate-x-full");
-      el("overlay").classList.add("hidden");
+      const sidebar = el("sidebar");
+      if (isDesktop()) {
+        sidebar.style.width = "0px";
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        el("overlay").classList.add("hidden");
+      }
     }
 
     function openSidebar() {
-      el("sidebar").classList.remove("-translate-x-full");
-      el("overlay").classList.remove("hidden");
+      const sidebar = el("sidebar");
+      if (isDesktop()) {
+        sidebar.style.width = "18rem";
+      } else {
+        sidebar.style.width = "18rem";
+        sidebar.classList.remove("-translate-x-full");
+        el("overlay").classList.remove("hidden");
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = el("sidebar");
+      if (isDesktop()) {
+        const isClosed = sidebar.style.width === "0px";
+        if (isClosed) {
+          openSidebar();
+        } else {
+          closeSidebar();
+        }
+      } else {
+        const isClosed = sidebar.classList.contains("-translate-x-full");
+        if (isClosed) {
+          openSidebar();
+        } else {
+          closeSidebar();
+        }
+      }
     }
 
     function showPage(page) {
@@ -390,7 +423,9 @@
 
       el("pageTitle").textContent = pageInfo[page][0];
       el("pageSubtitle").textContent = pageInfo[page][1];
-      closeSidebar();
+      if (!isDesktop()) {
+        closeSidebar();
+      }
       renderAll();
     }
 
@@ -685,26 +720,6 @@
       showPage("dashboard");
     }
 
-    function loadSample() {
-      const sample = {
-        nama: "Sumiatun",
-        nik: "1807134707530002",
-        rt: "02",
-        umur: 72,
-        penghasilan: "kurang_800",
-        tanggungan: 2,
-        kondisiRumah: "tidak_layak",
-        asetProduktif: "ada",
-        kendaraan: "sepeda",
-        dtks: "terdaftar",
-        ibuHamil: false,
-        balita: false,
-        anakSekolah: false,
-        disabilitas: false
-      };
-      setFormData(sample);
-      showPage("input");
-    }
 
     function exportCsv() {
       const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Kondisi Rumah", "Aset Produktif", "Kendaraan", "DTKS", "Komponen", "Skor", "Rekomendasi", "Rincian Bobot"];
@@ -749,12 +764,24 @@
       button.addEventListener("click", () => showPage(button.dataset.page));
     });
 
-    el("btnMenu").addEventListener("click", openSidebar);
+    el("btnMenu").addEventListener("click", toggleSidebar);
     el("overlay").addEventListener("click", closeSidebar);
+    window.addEventListener("resize", () => {
+      const sidebar = el("sidebar");
+      if (isDesktop()) {
+        el("overlay").classList.add("hidden");
+        sidebar.classList.remove("-translate-x-full");
+        if (sidebar.style.width !== "0px") {
+          sidebar.style.width = "18rem";
+        }
+      } else {
+        sidebar.style.width = "18rem";
+        sidebar.classList.add("-translate-x-full");
+      }
+    });
     el("formWarga").addEventListener("submit", saveData);
     el("btnResetForm").addEventListener("click", resetForm);
     el("btnResetAll").addEventListener("click", resetAll);
-    el("btnSample").addEventListener("click", loadSample);
     el("btnExport").addEventListener("click", exportCsv);
     el("searchInput").addEventListener("input", renderAll);
     el("filterStatus").addEventListener("change", renderAll);
