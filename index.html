@@ -3,278 +3,517 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aplikasi Rekomendasi PKH Forward Chaining</title>
+  <title>Aplikasi PKH Forward Chaining</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <main class="max-w-7xl mx-auto px-4 py-6">
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Aplikasi Rekomendasi PKH</h1>
-          <p class="text-slate-600 mt-2">Sistem pakar berbasis AI simbolik dengan metode forward chaining untuk rekomendasi kelayakan awal calon penerima PKH.</p>
+<body class="bg-slate-100 text-slate-900">
+  <div class="min-h-screen flex">
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 bg-slate-950 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+      <div class="p-5 border-b border-slate-800">
+        <h1 class="text-xl font-bold">PKH Expert System</h1>
+        <p class="text-sm text-slate-400 mt-1">Forward Chaining AI</p>
+      </div>
+
+      <nav class="p-4 space-y-2 flex-1">
+        <button data-page="dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold bg-blue-600 text-white">
+          <span>🏠</span><span>Dashboard</span>
+        </button>
+        <button data-page="input" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
+          <span>📝</span><span>Input Data</span>
+        </button>
+        <button data-page="search" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
+          <span>🔎</span><span>Cari Data</span>
+        </button>
+        <button data-page="result" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
+          <span>📊</span><span>Hasil Rekomendasi</span>
+        </button>
+        <button data-page="weight" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
+          <span>⚖️</span><span>Bobot Penilaian</span>
+        </button>
+        <button data-page="rule" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
+          <span>🧠</span><span>Aturan Sistem</span>
+        </button>
+      </nav>
+
+      <div class="p-4 border-t border-slate-800">
+        <button id="btnResetAll" class="w-full px-4 py-3 rounded-xl bg-rose-600 text-white font-semibold hover:bg-rose-700">Hapus Semua Data</button>
+        <p class="text-xs text-slate-500 mt-3">Sistem ini hanya memberi rekomendasi awal. Verifikasi petugas tetap diperlukan.</p>
+      </div>
+    </aside>
+
+    <div id="overlay" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden"></div>
+
+    <div class="flex-1 lg:ml-0 min-w-0">
+      <header class="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-3 lg:px-6 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button id="btnMenu" class="lg:hidden px-3 py-2 rounded-xl bg-slate-900 text-white">☰</button>
+          <div>
+            <h2 id="pageTitle" class="text-lg md:text-xl font-bold">Dashboard</h2>
+            <p id="pageSubtitle" class="text-xs md:text-sm text-slate-500">Informasi aplikasi rekomendasi PKH</p>
+          </div>
         </div>
-        <div class="flex flex-col sm:flex-row gap-2">
-          <label class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold cursor-pointer hover:bg-blue-700">
-            Upload Excel
-            <input id="fileInput" type="file" accept=".xlsx,.xls" class="hidden" />
-          </label>
-          <button id="btnSample" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800">Data Contoh</button>
+        <div class="flex items-center gap-2">
+          <button id="btnSample" class="hidden sm:inline-flex px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800">Isi Contoh</button>
           <button id="btnExport" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-40" disabled>Export CSV</button>
         </div>
-      </div>
-    </section>
+      </header>
 
-    <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <p class="text-sm text-slate-500">Total Data</p>
-        <h2 id="totalData" class="text-3xl font-bold mt-1">0</h2>
-      </div>
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <p class="text-sm text-slate-500">Layak Diusulkan</p>
-        <h2 id="totalLayak" class="text-3xl font-bold mt-1 text-emerald-600">0</h2>
-      </div>
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <p class="text-sm text-slate-500">Perlu Verifikasi</p>
-        <h2 id="totalVerifikasi" class="text-3xl font-bold mt-1 text-amber-600">0</h2>
-      </div>
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <p class="text-sm text-slate-500">Tidak Prioritas</p>
-        <h2 id="totalTidak" class="text-3xl font-bold mt-1 text-rose-600">0</h2>
-      </div>
-    </section>
-
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-      <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <h2 class="text-lg font-bold mb-3">Basis Aturan Forward Chaining</h2>
-        <div id="ruleBox" class="space-y-3 text-sm"></div>
-      </div>
-      <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <div>
-            <h2 class="text-lg font-bold">Hasil Rekomendasi</h2>
-            <p class="text-sm text-slate-500">Keputusan bersifat rekomendasi awal dan tetap membutuhkan verifikasi petugas.</p>
+      <main class="p-4 lg:p-6 max-w-7xl mx-auto">
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <p class="text-sm text-slate-500">Total Data</p>
+            <h2 id="totalData" class="text-3xl font-bold mt-1">0</h2>
           </div>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" class="px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <select id="filterStatus" class="px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="SEMUA">Semua Status</option>
-              <option value="Layak Diusulkan">Layak Diusulkan</option>
-              <option value="Perlu Verifikasi">Perlu Verifikasi</option>
-              <option value="Tidak Prioritas">Tidak Prioritas</option>
-            </select>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <p class="text-sm text-slate-500">Layak Diusulkan</p>
+            <h2 id="totalLayak" class="text-3xl font-bold mt-1 text-emerald-600">0</h2>
           </div>
-        </div>
-        <div class="overflow-auto rounded-xl border border-slate-200">
-          <table class="min-w-full text-sm">
-            <thead class="bg-slate-100 text-slate-700 sticky top-0">
-              <tr>
-                <th class="text-left px-3 py-3 font-semibold">No</th>
-                <th class="text-left px-3 py-3 font-semibold">Nama</th>
-                <th class="text-left px-3 py-3 font-semibold">NIK</th>
-                <th class="text-left px-3 py-3 font-semibold">RT</th>
-                <th class="text-left px-3 py-3 font-semibold">Skor</th>
-                <th class="text-left px-3 py-3 font-semibold">Komponen</th>
-                <th class="text-left px-3 py-3 font-semibold">Rekomendasi</th>
-                <th class="text-left px-3 py-3 font-semibold">Alasan</th>
-              </tr>
-            </thead>
-            <tbody id="resultBody" class="divide-y divide-slate-200 bg-white"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <p class="text-sm text-slate-500">Perlu Verifikasi</p>
+            <h2 id="totalVerifikasi" class="text-3xl font-bold mt-1 text-amber-600">0</h2>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <p class="text-sm text-slate-500">Tidak Prioritas</p>
+            <h2 id="totalTidak" class="text-3xl font-bold mt-1 text-rose-600">0</h2>
+          </div>
+        </section>
 
-    <section class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-      <h2 class="text-lg font-bold mb-3">Catatan Penggunaan</h2>
-      <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
-        <li>File Excel harus memiliki kolom NIK, NAMA, UMUR, PENGHASILAN, TANGGUNGAN KELUARGA, KONDISI RUMAH, ASET PRODUKTIF, KENDARAAN, dan RT.</li>
-        <li>Kolom tambahan yang disarankan: STATUS DTKS, IBU HAMIL, ANAK 0-6, ANAK SD, ANAK SMP, ANAK SMA, LANSIA, dan DISABILITAS BERAT.</li>
-        <li>Aplikasi ini tidak menggantikan keputusan resmi. Sistem hanya membantu skrining awal berbasis aturan.</li>
-      </ul>
-    </section>
-  </main>
+        <section id="page-dashboard" class="page-section space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-6 md:p-8 bg-gradient-to-br from-blue-600 to-slate-900 text-white">
+              <p class="text-sm uppercase tracking-wide text-blue-100 font-semibold">Aplikasi Sistem Pakar</p>
+              <h2 class="text-2xl md:text-4xl font-bold mt-2">Rekomendasi Kelayakan Awal Penerima PKH</h2>
+              <p class="text-blue-100 mt-3 max-w-3xl">Aplikasi ini membantu petugas memasukkan data warga, menghitung bobot kemiskinan, menjalankan metode forward chaining, dan menghasilkan rekomendasi awal penerima Program Keluarga Harapan.</p>
+              <div class="mt-5 flex flex-wrap gap-3">
+                <button data-page="input" class="open-page px-5 py-3 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50">Mulai Input Data</button>
+                <button data-page="weight" class="open-page px-5 py-3 rounded-xl bg-blue-500 text-white font-bold hover:bg-blue-400">Lihat Bobot</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <h3 class="font-bold text-lg mb-2">Tujuan Aplikasi</h3>
+              <p class="text-sm text-slate-600">Membantu proses skrining awal calon penerima PKH berdasarkan data sosial ekonomi dan komponen PKH.</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <h3 class="font-bold text-lg mb-2">Metode</h3>
+              <p class="text-sm text-slate-600">Sistem menggunakan forward chaining. Fakta dari data warga dicocokkan dengan aturan sampai menghasilkan rekomendasi.</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <h3 class="font-bold text-lg mb-2">Output</h3>
+              <p class="text-sm text-slate-600">Output sistem berupa skor, komponen PKH, status rekomendasi, dan rincian bobot yang menjadi alasan keputusan.</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <h3 class="text-lg font-bold mb-4">Alur Penggunaan</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                <p class="font-bold">1. Input Data</p>
+                <p class="text-slate-600 mt-1">Admin mengisi identitas dan kondisi sosial ekonomi warga.</p>
+              </div>
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                <p class="font-bold">2. Proses Aturan</p>
+                <p class="text-slate-600 mt-1">Sistem membaca fakta dan menjalankan aturan forward chaining.</p>
+              </div>
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                <p class="font-bold">3. Hitung Bobot</p>
+                <p class="text-slate-600 mt-1">Setiap kriteria diberi skor sesuai tingkat prioritas.</p>
+              </div>
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                <p class="font-bold">4. Rekomendasi</p>
+                <p class="text-slate-600 mt-1">Sistem menampilkan status layak, perlu verifikasi, atau tidak prioritas.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-input" class="page-section hidden">
+          <form id="formWarga" class="bg-white rounded-2xl border border-slate-200 p-5 md:p-6 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-5">
+              <div>
+                <h2 class="text-xl font-bold">Input Data Warga</h2>
+                <p class="text-sm text-slate-500 mt-1">Isi data warga. Sistem akan menghitung bobot secara otomatis.</p>
+              </div>
+              <button id="btnResetForm" type="button" class="px-4 py-2 rounded-xl bg-slate-200 text-slate-800 font-semibold hover:bg-slate-300">Reset Form</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-semibold mb-1">Nama Warga</label>
+                <input id="nama" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">NIK</label>
+                <input id="nik" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">RT</label>
+                <input id="rt" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">Umur</label>
+                <input id="umur" type="number" min="0" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">Penghasilan per Bulan</label>
+                <select id="penghasilan" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="kurang_800">Kurang dari Rp800.000</option>
+                  <option value="800_1000">Rp800.000 sampai Rp1.000.000</option>
+                  <option value="1000_2000">Di atas Rp1.000.000 sampai Rp2.000.000</option>
+                  <option value="lebih_2000">Di atas Rp2.000.000</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">Jumlah Tanggungan Keluarga</label>
+                <input id="tanggungan" type="number" min="0" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">Kondisi Rumah</label>
+                <select id="kondisiRumah" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="tidak_layak">Tidak Layak</option>
+                  <option value="layak">Layak</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">Aset Produktif</label>
+                <select id="asetProduktif" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="tidak_ada">Tidak Ada</option>
+                  <option value="ada">Ada</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">Kendaraan</label>
+                <select id="kendaraan" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="tidak_ada">Tidak Ada</option>
+                  <option value="sepeda">Sepeda</option>
+                  <option value="motor">Motor</option>
+                  <option value="mobil">Mobil</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-1">Status DTKS</label>
+                <select id="dtks" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="terdaftar">Terdaftar</option>
+                  <option value="belum">Belum Terdaftar</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 border border-slate-200 rounded-2xl p-4 bg-slate-50">
+              <p class="text-sm font-bold mb-3">Komponen PKH</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="flex items-center gap-2 text-sm"><input id="ibuHamil" type="checkbox" class="w-4 h-4" /> Ibu hamil atau menyusui</label>
+                <label class="flex items-center gap-2 text-sm"><input id="balita" type="checkbox" class="w-4 h-4" /> Anak usia 0 sampai 6 tahun</label>
+                <label class="flex items-center gap-2 text-sm"><input id="anakSekolah" type="checkbox" class="w-4 h-4" /> Anak sekolah SD, SMP, atau SMA</label>
+                <label class="flex items-center gap-2 text-sm"><input id="disabilitas" type="checkbox" class="w-4 h-4" /> Penyandang disabilitas berat</label>
+              </div>
+              <p class="text-xs text-slate-500 mt-3">Komponen lansia dihitung otomatis jika umur minimal 60 tahun.</p>
+            </div>
+
+            <div id="previewBox" class="hidden mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+              <h3 class="font-bold text-blue-900 mb-2">Preview Hasil Input Terakhir</h3>
+              <div id="previewContent" class="text-sm text-blue-900"></div>
+            </div>
+
+            <div class="mt-5 flex flex-col sm:flex-row gap-3">
+              <button type="submit" class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">Simpan Data</button>
+              <button type="button" data-page="result" class="open-page px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800">Lihat Hasil</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="page-search" class="page-section hidden space-y-5">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h2 class="text-xl font-bold">Cari Data Warga</h2>
+            <p class="text-sm text-slate-500 mt-1">Cari berdasarkan nama, NIK, RT, atau status rekomendasi.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" class="md:col-span-2 px-3 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <select id="filterStatus" class="px-3 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="SEMUA">Semua Status</option>
+                <option value="Layak Diusulkan">Layak Diusulkan</option>
+                <option value="Perlu Verifikasi">Perlu Verifikasi</option>
+                <option value="Tidak Prioritas">Tidak Prioritas</option>
+              </select>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="font-bold mb-3">Hasil Pencarian</h3>
+            <div id="searchCards" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+          </div>
+        </section>
+
+        <section id="page-result" class="page-section hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h2 class="text-xl font-bold">Hasil Rekomendasi</h2>
+                <p class="text-sm text-slate-500">Tabel data warga dan hasil proses forward chaining.</p>
+              </div>
+              <button data-page="input" class="open-page px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">Tambah Data</button>
+            </div>
+            <div class="overflow-auto rounded-xl border border-slate-200">
+              <table class="min-w-full text-sm">
+                <thead class="bg-slate-100 text-slate-700 sticky top-0">
+                  <tr>
+                    <th class="text-left px-3 py-3 font-semibold">No</th>
+                    <th class="text-left px-3 py-3 font-semibold">Nama</th>
+                    <th class="text-left px-3 py-3 font-semibold">NIK</th>
+                    <th class="text-left px-3 py-3 font-semibold">RT</th>
+                    <th class="text-left px-3 py-3 font-semibold">Skor</th>
+                    <th class="text-left px-3 py-3 font-semibold">Komponen</th>
+                    <th class="text-left px-3 py-3 font-semibold">Rekomendasi</th>
+                    <th class="text-left px-3 py-3 font-semibold">Rincian Bobot</th>
+                    <th class="text-left px-3 py-3 font-semibold">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="resultBody" class="divide-y divide-slate-200 bg-white"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-weight" class="page-section hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h2 class="text-xl font-bold">Bobot Penilaian</h2>
+            <p class="text-sm text-slate-500 mt-1">Bobot digunakan untuk menghitung skor prioritas setiap warga.</p>
+            <div id="weightBox" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 text-sm mt-5"></div>
+          </div>
+        </section>
+
+        <section id="page-rule" class="page-section hidden space-y-5">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h2 class="text-xl font-bold">Aturan Forward Chaining</h2>
+            <p class="text-sm text-slate-500 mt-1">Sistem membaca fakta, menambahkan bobot, lalu menentukan rekomendasi.</p>
+            <div id="ruleBox" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-5"></div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h2 class="text-xl font-bold mb-4">Aturan Keputusan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+              <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                <h3 class="font-bold text-emerald-800">Layak Diusulkan</h3>
+                <p class="text-emerald-700 mt-1">Skor minimal 70, terdaftar DTKS, dan memiliki minimal satu komponen PKH.</p>
+              </div>
+              <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <h3 class="font-bold text-amber-800">Perlu Verifikasi</h3>
+                <p class="text-amber-700 mt-1">Skor 50 sampai 69, atau data potensial tetapi DTKS belum terdaftar.</p>
+              </div>
+              <div class="rounded-xl border border-rose-200 bg-rose-50 p-4">
+                <h3 class="font-bold text-rose-800">Tidak Prioritas</h3>
+                <p class="text-rose-700 mt-1">Skor di bawah 50, tidak memiliki komponen PKH, atau ada indikator ekonomi kuat.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
 
   <script>
-    const rules = [
-      { id: "R1", text: "IF penghasilan rendah THEN fakta ekonomi rentan", weight: 30 },
-      { id: "R2", text: "IF rumah tidak layak THEN fakta hunian rentan", weight: 20 },
-      { id: "R3", text: "IF tanggungan keluarga banyak THEN fakta beban keluarga tinggi", weight: 15 },
-      { id: "R4", text: "IF tidak punya aset produktif THEN fakta aset rendah", weight: 15 },
-      { id: "R5", text: "IF usia minimal 60 tahun THEN komponen PKH lansia", weight: 20 },
-      { id: "R6", text: "IF ada ibu hamil, balita, anak sekolah, lansia, atau disabilitas berat THEN punya komponen PKH", weight: 0 },
-      { id: "R7", text: "IF skor tinggi AND punya komponen PKH THEN layak diusulkan", weight: 0 },
-      { id: "R8", text: "IF kendaraan mobil AND rumah layak AND penghasilan tinggi THEN tidak prioritas", weight: -25 }
+    const weights = [
+      { code: "B1", name: "Penghasilan kurang dari Rp800.000", value: 25 },
+      { code: "B2", name: "Penghasilan Rp800.000 sampai Rp1.000.000", value: 20 },
+      { code: "B3", name: "Rumah tidak layak", value: 20 },
+      { code: "B4", name: "Tanggungan keluarga 4 orang atau lebih", value: 15 },
+      { code: "B5", name: "Tanggungan keluarga 3 orang", value: 10 },
+      { code: "B6", name: "Tidak memiliki aset produktif", value: 15 },
+      { code: "B7", name: "Tidak memiliki kendaraan atau hanya sepeda", value: 10 },
+      { code: "B8", name: "Terdaftar DTKS", value: 10 },
+      { code: "B9", name: "Memiliki komponen PKH", value: 20 },
+      { code: "B10", name: "Indikator ekonomi kuat: mobil, rumah layak, dan penghasilan tinggi", value: -30 }
     ];
 
+    const rules = [
+      "IF penghasilan kurang dari Rp800.000 THEN bobot ekonomi sangat rentan +25",
+      "IF penghasilan Rp800.000 sampai Rp1.000.000 THEN bobot ekonomi rentan +20",
+      "IF rumah tidak layak THEN bobot kondisi hunian +20",
+      "IF tanggungan keluarga minimal 4 orang THEN bobot beban keluarga +15",
+      "IF tidak memiliki aset produktif THEN bobot kepemilikan aset +15",
+      "IF tidak memiliki kendaraan atau hanya sepeda THEN bobot akses kendaraan +10",
+      "IF terdaftar DTKS THEN bobot validasi data +10",
+      "IF memiliki komponen PKH THEN bobot komponen bantuan +20",
+      "IF mobil AND rumah layak AND penghasilan tinggi THEN bobot ekonomi kuat -30",
+      "IF skor >= 70 AND DTKS terdaftar AND komponen PKH ada THEN layak diusulkan"
+    ];
+
+    const pageInfo = {
+      dashboard: ["Dashboard", "Informasi aplikasi rekomendasi PKH"],
+      input: ["Input Data", "Masukkan data warga secara manual"],
+      search: ["Cari Data", "Temukan data warga yang sudah diinput"],
+      result: ["Hasil Rekomendasi", "Lihat hasil perhitungan forward chaining"],
+      weight: ["Bobot Penilaian", "Daftar bobot setiap kriteria"],
+      rule: ["Aturan Sistem", "Basis aturan forward chaining"]
+    };
+
     let results = [];
+    let editIndex = null;
+    let currentPage = "dashboard";
 
     const el = id => document.getElementById(id);
 
-    function normalizeKey(value) {
-      return String(value ?? "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-zA-Z0-9]/g, "")
-        .toUpperCase();
+    function labelFromValue(value, map) {
+      return map[value] || value;
     }
 
-    function clean(value) {
-      return String(value ?? "").trim();
+    function closeSidebar() {
+      el("sidebar").classList.add("-translate-x-full");
+      el("overlay").classList.add("hidden");
     }
 
-    function yes(value) {
-      const text = clean(value).toUpperCase();
-      return ["YA", "IYA", "ADA", "TERDAFTAR", "TRUE", "1"].some(v => text.includes(v));
+    function openSidebar() {
+      el("sidebar").classList.remove("-translate-x-full");
+      el("overlay").classList.remove("hidden");
     }
 
-    function parseAge(value) {
-      const match = clean(value).match(/\d+/);
-      return match ? Number(match[0]) : 0;
+    function showPage(page) {
+      currentPage = page;
+      document.querySelectorAll(".page-section").forEach(section => section.classList.add("hidden"));
+      el(`page-${page}`).classList.remove("hidden");
+
+      document.querySelectorAll(".nav-btn").forEach(button => {
+        const active = button.dataset.page === page;
+        button.className = active
+          ? "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold bg-blue-600 text-white"
+          : "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200";
+      });
+
+      el("pageTitle").textContent = pageInfo[page][0];
+      el("pageSubtitle").textContent = pageInfo[page][1];
+      closeSidebar();
+      renderAll();
     }
 
-    function parseNumber(value) {
-      const text = clean(value).replace(/[^0-9]/g, "");
-      return text ? Number(text) : 0;
+    function getFormData() {
+      return {
+        nama: el("nama").value.trim(),
+        nik: el("nik").value.trim(),
+        rt: el("rt").value.trim(),
+        umur: Number(el("umur").value || 0),
+        penghasilan: el("penghasilan").value,
+        tanggungan: Number(el("tanggungan").value || 0),
+        kondisiRumah: el("kondisiRumah").value,
+        asetProduktif: el("asetProduktif").value,
+        kendaraan: el("kendaraan").value,
+        dtks: el("dtks").value,
+        ibuHamil: el("ibuHamil").checked,
+        balita: el("balita").checked,
+        anakSekolah: el("anakSekolah").checked,
+        disabilitas: el("disabilitas").checked
+      };
     }
 
-    function parseIncome(value) {
-      const text = clean(value).toUpperCase();
-      const number = parseNumber(text);
-      if (!number) return 0;
-      if (text.includes("2.000.000") || text.includes("2000000")) return text.includes(">") ? 2500000 : 2000000;
-      if (text.includes("1.000.000") || text.includes("1000000")) return text.includes(">") ? 1500000 : 1000000;
-      if (text.includes("800") && text.includes("<")) return 799999;
-      return number;
+    function setFormData(data) {
+      el("nama").value = data.nama;
+      el("nik").value = data.nik;
+      el("rt").value = data.rt;
+      el("umur").value = data.umur;
+      el("penghasilan").value = data.penghasilan;
+      el("tanggungan").value = data.tanggungan;
+      el("kondisiRumah").value = data.kondisiRumah;
+      el("asetProduktif").value = data.asetProduktif;
+      el("kendaraan").value = data.kendaraan;
+      el("dtks").value = data.dtks;
+      el("ibuHamil").checked = data.ibuHamil;
+      el("balita").checked = data.balita;
+      el("anakSekolah").checked = data.anakSekolah;
+      el("disabilitas").checked = data.disabilitas;
     }
 
-    function getField(row, keys) {
-      for (const key of keys) {
-        if (row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
-      }
-      return "";
+    function resetForm() {
+      el("formWarga").reset();
+      editIndex = null;
+      el("formWarga").querySelector("button[type='submit']").textContent = "Simpan Data";
     }
 
-    function mapRows(rows) {
-      const headerIndex = rows.findIndex(row => row.some(cell => normalizeKey(cell) === "NIK") && row.some(cell => normalizeKey(cell) === "NAMA"));
-      if (headerIndex < 0) throw new Error("Header NIK dan NAMA tidak ditemukan.");
-      const headers = rows[headerIndex].map(normalizeKey);
-      return rows.slice(headerIndex + 1)
-        .filter(row => row.some(cell => clean(cell) !== ""))
-        .map(row => {
-          const object = {};
-          headers.forEach((header, index) => object[header] = row[index] ?? "");
-          return object;
-        });
-    }
-
-    function infer(row, index) {
-      const nama = getField(row, ["NAMA"]);
-      const nik = getField(row, ["NIK"]);
-      const rt = getField(row, ["RT"]);
-      const umur = parseAge(getField(row, ["UMUR", "USIA"]));
-      const penghasilanText = getField(row, ["PENGHASILAN", "PENDAPATAN"]);
-      const penghasilan = parseIncome(penghasilanText);
-      const tanggungan = parseNumber(getField(row, ["TANGGUNGANKELUARGA", "JUMLAHTANGGUNGAN"]));
-      const kondisiRumah = clean(getField(row, ["KONDISIRUMAH"])).toUpperCase();
-      const aset = clean(getField(row, ["ASETPRODUKTIF", "ASET"])).toUpperCase();
-      const kendaraan = clean(getField(row, ["KENDARAAN"])).toUpperCase();
-      const statusDtks = clean(getField(row, ["STATUSDTKS", "DTKS"])).toUpperCase();
-
-      const facts = [];
-      const components = [];
+    function infer(data) {
       let score = 0;
+      const details = [];
+      const components = [];
 
-      if (penghasilan > 0 && penghasilan <= 800000) {
-        score += 30;
-        facts.push("penghasilan rendah");
-      } else if (penghasilan > 0 && penghasilan <= 1000000) {
+      if (data.penghasilan === "kurang_800") {
+        score += 25;
+        details.push("Penghasilan kurang dari Rp800.000: +25");
+      } else if (data.penghasilan === "800_1000") {
         score += 20;
-        facts.push("penghasilan cukup rendah");
-      } else if (penghasilan >= 2000000) {
-        facts.push("penghasilan tinggi");
+        details.push("Penghasilan Rp800.000 sampai Rp1.000.000: +20");
       }
 
-      if (kondisiRumah.includes("TIDAK")) {
+      if (data.kondisiRumah === "tidak_layak") {
         score += 20;
-        facts.push("rumah tidak layak");
+        details.push("Rumah tidak layak: +20");
       }
 
-      if (tanggungan >= 4) {
+      if (data.tanggungan >= 4) {
         score += 15;
-        facts.push("tanggungan keluarga banyak");
-      } else if (tanggungan >= 3) {
+        details.push("Tanggungan 4 orang atau lebih: +15");
+      } else if (data.tanggungan === 3) {
         score += 10;
-        facts.push("tanggungan keluarga sedang");
+        details.push("Tanggungan 3 orang: +10");
       }
 
-      if (aset.includes("TIDAK") || aset === "" || aset.includes("TIDAK ADA")) {
+      if (data.asetProduktif === "tidak_ada") {
         score += 15;
-        facts.push("tidak punya aset produktif");
+        details.push("Tidak memiliki aset produktif: +15");
       }
 
-      if (kendaraan.includes("SEPEDA") && !kendaraan.includes("MOTOR") && !kendaraan.includes("MOBIL")) {
+      if (data.kendaraan === "tidak_ada" || data.kendaraan === "sepeda") {
         score += 10;
-        facts.push("akses kendaraan terbatas");
+        details.push("Kendaraan terbatas: +10");
       }
 
-      if (umur >= 60) {
+      if (data.dtks === "terdaftar") {
+        score += 10;
+        details.push("Terdaftar DTKS: +10");
+      } else {
+        details.push("Belum terdaftar DTKS: +0 dan perlu verifikasi");
+      }
+
+      if (data.ibuHamil) components.push("Ibu hamil atau menyusui");
+      if (data.balita) components.push("Anak usia 0 sampai 6 tahun");
+      if (data.anakSekolah) components.push("Anak sekolah");
+      if (data.umur >= 60) components.push("Lansia");
+      if (data.disabilitas) components.push("Disabilitas berat");
+
+      const hasComponent = components.length > 0;
+
+      if (hasComponent) {
         score += 20;
-        components.push("Lansia");
-        facts.push("usia lansia");
+        details.push("Memiliki komponen PKH: +20");
+      } else {
+        details.push("Belum memiliki komponen PKH: +0");
       }
 
-      const ibuHamil = yes(getField(row, ["IBUHAMIL", "HAMIL"]));
-      const balita = yes(getField(row, ["ANAK06", "ANAK0SAMPAI6", "BALITA"]));
-      const anakSd = yes(getField(row, ["ANAKSD", "SD"]));
-      const anakSmp = yes(getField(row, ["ANAKSMP", "SMP"]));
-      const anakSma = yes(getField(row, ["ANAKSMA", "SMA"]));
-      const disabilitas = yes(getField(row, ["DISABILITASBERAT", "DISABILITAS"]));
-
-      if (ibuHamil) components.push("Ibu Hamil");
-      if (balita) components.push("Balita");
-      if (anakSd || anakSmp || anakSma) components.push("Pendidikan");
-      if (disabilitas) components.push("Disabilitas Berat");
-
-      const punyaKomponen = components.length > 0;
-      const dtksTidakTerdaftar = statusDtks && !yes(statusDtks);
-      const kendaraanMahal = kendaraan.includes("MOBIL");
-      const rumahLayak = kondisiRumah === "LAYAK";
-
-      if (kendaraanMahal && rumahLayak && penghasilan >= 2000000) {
-        score -= 25;
-        facts.push("indikasi ekonomi lebih kuat");
+      if (data.kendaraan === "mobil" && data.kondisiRumah === "layak" && data.penghasilan === "lebih_2000") {
+        score -= 30;
+        details.push("Indikator ekonomi kuat: -30");
       }
 
       score = Math.max(0, Math.min(100, score));
 
       let recommendation = "Tidak Prioritas";
-      if (dtksTidakTerdaftar) {
-        recommendation = "Perlu Verifikasi";
-        facts.push("status DTKS belum memenuhi syarat");
-      } else if (score >= 60 && punyaKomponen) {
+      if (score >= 70 && hasComponent && data.dtks === "terdaftar") {
         recommendation = "Layak Diusulkan";
-      } else if (score >= 50 || (score >= 40 && punyaKomponen)) {
+      } else if (score >= 50 || (hasComponent && data.dtks === "belum")) {
         recommendation = "Perlu Verifikasi";
-      }
-
-      if (!punyaKomponen) {
-        facts.push("komponen PKH belum teridentifikasi pada data");
       }
 
       return {
-        no: index + 1,
-        nama,
-        nik,
-        rt,
-        umur,
-        penghasilanText,
-        tanggungan,
+        ...data,
         score,
-        components: components.length ? components.join(", ") : "Belum teridentifikasi",
+        components: hasComponent ? components.join(", ") : "Belum ada komponen PKH",
         recommendation,
-        reason: facts.join("; ") || "data belum cukup"
+        details: details.join("; ")
       };
     }
 
@@ -284,39 +523,25 @@
       return "bg-rose-100 text-rose-700";
     }
 
-    function renderRules() {
-      el("ruleBox").innerHTML = rules.map(rule => `
-        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-bold text-slate-900">${rule.id}</span>
-            <span class="text-xs rounded-full px-2 py-1 bg-white border border-slate-200">Bobot ${rule.weight}</span>
+    function renderWeights() {
+      el("weightBox").innerHTML = weights.map(item => `
+        <div class="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div>
+            <p class="font-bold text-slate-900">${item.code}</p>
+            <p class="text-slate-600 mt-1">${item.name}</p>
           </div>
-          <p class="text-slate-600 mt-2">${rule.text}</p>
+          <span class="shrink-0 rounded-full px-3 py-1 text-xs font-bold ${item.value < 0 ? "bg-rose-100 text-rose-700" : "bg-blue-100 text-blue-700"}">${item.value > 0 ? "+" : ""}${item.value}</span>
         </div>
       `).join("");
     }
 
-    function renderTable() {
-      const query = el("searchInput").value.toLowerCase();
-      const filter = el("filterStatus").value;
-      const filtered = results.filter(item => {
-        const matchQuery = [item.nama, item.nik, item.rt, item.recommendation].join(" ").toLowerCase().includes(query);
-        const matchStatus = filter === "SEMUA" || item.recommendation === filter;
-        return matchQuery && matchStatus;
-      });
-
-      el("resultBody").innerHTML = filtered.map(item => `
-        <tr class="hover:bg-slate-50 align-top">
-          <td class="px-3 py-3">${item.no}</td>
-          <td class="px-3 py-3 font-semibold whitespace-nowrap">${item.nama}</td>
-          <td class="px-3 py-3 whitespace-nowrap">${item.nik}</td>
-          <td class="px-3 py-3">${item.rt}</td>
-          <td class="px-3 py-3 font-bold">${item.score}</td>
-          <td class="px-3 py-3">${item.components}</td>
-          <td class="px-3 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass(item.recommendation)}">${item.recommendation}</span></td>
-          <td class="px-3 py-3 min-w-[260px] text-slate-600">${item.reason}</td>
-        </tr>
-      `).join("") || `<tr><td colspan="8" class="px-3 py-6 text-center text-slate-500">Belum ada data yang ditampilkan.</td></tr>`;
+    function renderRules() {
+      el("ruleBox").innerHTML = rules.map((rule, index) => `
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p class="font-bold text-slate-900">R${index + 1}</p>
+          <p class="text-sm text-slate-600 mt-1">${rule}</p>
+        </div>
+      `).join("");
     }
 
     function renderSummary() {
@@ -327,77 +552,217 @@
       el("btnExport").disabled = results.length === 0;
     }
 
-    function runInference(dataRows) {
-      results = dataRows.map(infer);
-      renderSummary();
-      renderTable();
+    function renderPreview(item) {
+      el("previewBox").classList.remove("hidden");
+      el("previewContent").innerHTML = `
+        <p><strong>${item.nama}</strong> memperoleh skor <strong>${item.score}</strong>.</p>
+        <p>Status rekomendasi: <strong>${item.recommendation}</strong>.</p>
+        <p>Komponen: ${item.components}.</p>
+        <p class="mt-1">Rincian: ${item.details}.</p>
+      `;
     }
 
-    function readExcel(file) {
-      const reader = new FileReader();
-      reader.onload = event => {
-        try {
-          const workbook = XLSX.read(new Uint8Array(event.target.result), { type: "array" });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
-          const dataRows = mapRows(rows);
-          runInference(dataRows);
-        } catch (error) {
-          alert(error.message || "File Excel gagal dibaca.");
-        }
+    function getFilteredResults() {
+      const query = el("searchInput") ? el("searchInput").value.toLowerCase() : "";
+      const filter = el("filterStatus") ? el("filterStatus").value : "SEMUA";
+
+      return results.filter(item => {
+        const matchQuery = [item.nama, item.nik, item.rt, item.recommendation].join(" ").toLowerCase().includes(query);
+        const matchStatus = filter === "SEMUA" || item.recommendation === filter;
+        return matchQuery && matchStatus;
+      });
+    }
+
+    function renderSearchCards() {
+      const filtered = getFilteredResults();
+      el("searchCards").innerHTML = filtered.map(item => {
+        const realIndex = results.indexOf(item);
+        return `
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 class="font-bold text-lg">${item.nama}</h3>
+                <p class="text-sm text-slate-500">NIK: ${item.nik}</p>
+                <p class="text-sm text-slate-500">RT: ${item.rt} | Umur: ${item.umur} tahun</p>
+              </div>
+              <span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass(item.recommendation)}">${item.recommendation}</span>
+            </div>
+            <div class="mt-3 text-sm text-slate-600">
+              <p><strong>Skor:</strong> ${item.score}</p>
+              <p><strong>Komponen:</strong> ${item.components}</p>
+              <p class="mt-1"><strong>Rincian:</strong> ${item.details}</p>
+            </div>
+            <div class="flex gap-2 mt-4">
+              <button onclick="editData(${realIndex})" class="px-3 py-2 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600">Edit</button>
+              <button onclick="deleteData(${realIndex})" class="px-3 py-2 rounded-lg bg-rose-600 text-white font-semibold hover:bg-rose-700">Hapus</button>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="col-span-full text-center py-8 text-slate-500">Data tidak ditemukan.</div>`;
+    }
+
+    function renderTable() {
+      const incomeLabels = {
+        kurang_800: "< Rp800.000",
+        "800_1000": "Rp800.000 sampai Rp1.000.000",
+        "1000_2000": "> Rp1.000.000 sampai Rp2.000.000",
+        lebih_2000: "> Rp2.000.000"
       };
-      reader.readAsArrayBuffer(file);
+
+      el("resultBody").innerHTML = results.map((item, index) => `
+        <tr class="hover:bg-slate-50 align-top">
+          <td class="px-3 py-3">${index + 1}</td>
+          <td class="px-3 py-3 min-w-[160px]">
+            <p class="font-semibold">${item.nama}</p>
+            <p class="text-xs text-slate-500">Umur ${item.umur} tahun</p>
+            <p class="text-xs text-slate-500">Penghasilan ${labelFromValue(item.penghasilan, incomeLabels)}</p>
+          </td>
+          <td class="px-3 py-3 whitespace-nowrap">${item.nik}</td>
+          <td class="px-3 py-3">${item.rt}</td>
+          <td class="px-3 py-3 font-bold">${item.score}</td>
+          <td class="px-3 py-3 min-w-[180px]">${item.components}</td>
+          <td class="px-3 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass(item.recommendation)}">${item.recommendation}</span></td>
+          <td class="px-3 py-3 min-w-[280px] text-slate-600">${item.details}</td>
+          <td class="px-3 py-3 min-w-[120px]">
+            <button onclick="editData(${index})" class="block w-full mb-2 px-3 py-1 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600">Edit</button>
+            <button onclick="deleteData(${index})" class="block w-full px-3 py-1 rounded-lg bg-rose-600 text-white font-semibold hover:bg-rose-700">Hapus</button>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="9" class="px-3 py-6 text-center text-slate-500">Belum ada data. Silakan input data warga.</td></tr>`;
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderTable();
+      renderSearchCards();
+    }
+
+    function saveData(event) {
+      event.preventDefault();
+      const data = getFormData();
+
+      if (!data.nama || !data.nik || !data.rt || data.umur <= 0) {
+        alert("Nama, NIK, RT, dan umur wajib diisi.");
+        return;
+      }
+
+      const result = infer(data);
+
+      if (editIndex === null) {
+        results.push(result);
+      } else {
+        results[editIndex] = result;
+      }
+
+      renderPreview(result);
+      renderAll();
+      resetForm();
+      showPage("result");
+    }
+
+    function editData(index) {
+      const item = results[index];
+      setFormData(item);
+      editIndex = index;
+      el("formWarga").querySelector("button[type='submit']").textContent = "Update Data";
+      showPage("input");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteData(index) {
+      if (!confirm("Hapus data ini?")) return;
+      results.splice(index, 1);
+      renderAll();
+    }
+
+    function resetAll() {
+      if (!confirm("Hapus semua data?")) return;
+      results = [];
+      editIndex = null;
+      el("previewBox").classList.add("hidden");
+      resetForm();
+      renderAll();
+      showPage("dashboard");
+    }
+
+    function loadSample() {
+      const sample = {
+        nama: "Sumiatun",
+        nik: "1807134707530002",
+        rt: "02",
+        umur: 72,
+        penghasilan: "kurang_800",
+        tanggungan: 2,
+        kondisiRumah: "tidak_layak",
+        asetProduktif: "ada",
+        kendaraan: "sepeda",
+        dtks: "terdaftar",
+        ibuHamil: false,
+        balita: false,
+        anakSekolah: false,
+        disabilitas: false
+      };
+      setFormData(sample);
+      showPage("input");
     }
 
     function exportCsv() {
-      const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Skor", "Komponen", "Rekomendasi", "Alasan"];
-      const rows = results.map(item => [
-        item.no,
+      const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Kondisi Rumah", "Aset Produktif", "Kendaraan", "DTKS", "Komponen", "Skor", "Rekomendasi", "Rincian Bobot"];
+      const incomeLabels = {
+        kurang_800: "Kurang dari Rp800.000",
+        "800_1000": "Rp800.000 sampai Rp1.000.000",
+        "1000_2000": "Di atas Rp1.000.000 sampai Rp2.000.000",
+        lebih_2000: "Di atas Rp2.000.000"
+      };
+      const rows = results.map((item, index) => [
+        index + 1,
         item.nama,
         item.nik,
         item.rt,
         item.umur,
-        item.penghasilanText,
+        incomeLabels[item.penghasilan],
         item.tanggungan,
-        item.score,
+        item.kondisiRumah === "tidak_layak" ? "Tidak Layak" : "Layak",
+        item.asetProduktif === "tidak_ada" ? "Tidak Ada" : "Ada",
+        item.kendaraan,
+        item.dtks === "terdaftar" ? "Terdaftar" : "Belum Terdaftar",
         item.components,
+        item.score,
         item.recommendation,
-        item.reason
+        item.details
       ]);
+
       const csv = [headers, ...rows]
         .map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(","))
         .join("\n");
+
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "hasil_rekomendasi_pkh.csv";
+      a.download = "hasil_rekomendasi_pkh_manual.csv";
       a.click();
       URL.revokeObjectURL(url);
     }
 
-    function loadSample() {
-      const sample = [
-        { NAMA: "SUMIATUN", NIK: "1807134707530002", UMUR: "72 thn", PENGHASILAN: "< Rp.800,000", TANGGUNGANKELUARGA: "2", KONDISIRUMAH: "TIDAK LAYAK", ASETPRODUKTIF: "SAWAH", KENDARAAN: "SEPEDA", RT: "2" },
-        { NAMA: "AKHMAD MUKHLISIN", NIK: "1807080510920003", UMUR: "33 thn", PENGHASILAN: "> Rp 1.000.000", TANGGUNGANKELUARGA: "4", KONDISIRUMAH: "LAYAK", ASETPRODUKTIF: "TIDAK ADA", KENDARAAN: "MOTOR", RT: "2" },
-        { NAMA: "SUKARMAN HADI PRASETYO", NIK: "1802231103930001", UMUR: "32 thn", PENGHASILAN: "> Rp 2.000.000", TANGGUNGANKELUARGA: "1", KONDISIRUMAH: "LAYAK", ASETPRODUKTIF: "SAWAH", KENDARAAN: "MOTOR, MOBIL", RT: "2" }
-      ];
-      runInference(sample);
-    }
-
-    el("fileInput").addEventListener("change", event => {
-      const file = event.target.files[0];
-      if (file) readExcel(file);
+    document.querySelectorAll(".nav-btn, .open-page").forEach(button => {
+      button.addEventListener("click", () => showPage(button.dataset.page));
     });
 
-    el("searchInput").addEventListener("input", renderTable);
-    el("filterStatus").addEventListener("change", renderTable);
-    el("btnExport").addEventListener("click", exportCsv);
+    el("btnMenu").addEventListener("click", openSidebar);
+    el("overlay").addEventListener("click", closeSidebar);
+    el("formWarga").addEventListener("submit", saveData);
+    el("btnResetForm").addEventListener("click", resetForm);
+    el("btnResetAll").addEventListener("click", resetAll);
     el("btnSample").addEventListener("click", loadSample);
+    el("btnExport").addEventListener("click", exportCsv);
+    el("searchInput").addEventListener("input", renderAll);
+    el("filterStatus").addEventListener("change", renderAll);
 
+    renderWeights();
     renderRules();
-    renderSummary();
-    renderTable();
+    renderAll();
+    showPage("dashboard");
   </script>
 </body>
 </html>
