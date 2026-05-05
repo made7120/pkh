@@ -4,240 +4,258 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aplikasi PKH Forward Chaining</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-slate-100 text-slate-900">
-  <div class="min-h-screen flex">
-    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 bg-slate-950 text-white transform -translate-x-full lg:translate-x-0 transition-all duration-300 flex flex-col overflow-hidden">
-      <div class="p-5 border-b border-slate-800">
-        <h1 class="text-xl font-bold">PKH Expert System</h1>
-        <p class="text-sm text-slate-400 mt-1">Forward Chaining AI</p>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">KD</div>
+        <div>
+          <h1>Kantor Desa</h1>
+          <p>Sistem Rekomendasi PKH</p>
+        </div>
       </div>
 
-      <nav class="p-4 space-y-2 flex-1">
-        <button data-page="dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold bg-blue-600 text-white">
-          <span>🏠</span><span>Dashboard</span>
+      <nav class="sidebar-nav">
+        <button data-page="dashboard" class="nav-btn active">
+          <span class="nav-icon">🏠</span>
+          <span>Dashboard</span>
         </button>
-        <button data-page="input" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
-          <span>📝</span><span>Input Data</span>
+        <button data-page="input" class="nav-btn">
+          <span class="nav-icon">📝</span>
+          <span>Input Data</span>
         </button>
-        <button data-page="search" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
-          <span>🔎</span><span>Cari Data</span>
+        <button data-page="search" class="nav-btn">
+          <span class="nav-icon">🔎</span>
+          <span>Cari Data</span>
         </button>
-        <button data-page="result" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
-          <span>📊</span><span>Hasil Rekomendasi</span>
+        <button data-page="result" class="nav-btn">
+          <span class="nav-icon">📊</span>
+          <span>Hasil Rekomendasi</span>
         </button>
-        <button data-page="weight" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
-          <span>⚖️</span><span>Bobot Penilaian</span>
+        <button data-page="weight" class="nav-btn">
+          <span class="nav-icon">⚖️</span>
+          <span>Bobot Penilaian</span>
         </button>
-        <button data-page="rule" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200">
-          <span>🧠</span><span>Aturan Sistem</span>
+        <button data-page="rule" class="nav-btn">
+          <span class="nav-icon">🧠</span>
+          <span>Aturan Sistem</span>
         </button>
       </nav>
 
-      <div class="p-4 border-t border-slate-800">
-        <button id="btnExport" class="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-40" disabled>Export CSV</button>
-        <p class="text-xs text-slate-500 mt-3">Sistem ini hanya memberi rekomendasi awal. Verifikasi petugas tetap diperlukan.</p>
+      <div class="sidebar-footer">
+        <button id="btnExport" class="btn btn-export" disabled>Export CSV</button>
+        <p>Rekomendasi awal. Verifikasi lapangan tetap diperlukan.</p>
       </div>
     </aside>
 
-    <div id="overlay" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden"></div>
+    <div id="overlay" class="overlay"></div>
 
-    <div class="flex-1 lg:ml-0 min-w-0">
-      <header class="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-3 lg:px-6 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <button id="btnMenu" class="px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800">☰</button>
+    <div class="content-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="btnMenu" class="menu-btn" aria-label="Toggle sidebar">☰</button>
           <div>
-            <h2 id="pageTitle" class="text-lg md:text-xl font-bold">Dashboard</h2>
-            <p id="pageSubtitle" class="text-xs md:text-sm text-slate-500">Informasi aplikasi rekomendasi PKH</p>
+            <h2 id="pageTitle">Dashboard</h2>
+            <p id="pageSubtitle">Informasi aplikasi rekomendasi PKH</p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-        </div>
+        <div class="topbar-badge">Desa Digital</div>
       </header>
 
-      <main class="p-4 lg:p-6 max-w-7xl mx-auto">
-        <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <p class="text-sm text-slate-500">Total Data</p>
-            <h2 id="totalData" class="text-3xl font-bold mt-1">0</h2>
-          </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <p class="text-sm text-slate-500">Layak Diusulkan</p>
-            <h2 id="totalLayak" class="text-3xl font-bold mt-1 text-emerald-600">0</h2>
-          </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <p class="text-sm text-slate-500">Perlu Verifikasi</p>
-            <h2 id="totalVerifikasi" class="text-3xl font-bold mt-1 text-amber-600">0</h2>
-          </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <p class="text-sm text-slate-500">Tidak Prioritas</p>
-            <h2 id="totalTidak" class="text-3xl font-bold mt-1 text-rose-600">0</h2>
-          </div>
+      <main class="main-content">
+        <section class="summary-grid">
+          <article class="summary-card">
+            <p>Total Data</p>
+            <h3 id="totalData">0</h3>
+          </article>
+          <article class="summary-card green">
+            <p>Layak Diusulkan</p>
+            <h3 id="totalLayak">0</h3>
+          </article>
+          <article class="summary-card yellow">
+            <p>Perlu Verifikasi</p>
+            <h3 id="totalVerifikasi">0</h3>
+          </article>
+          <article class="summary-card red">
+            <p>Tidak Prioritas</p>
+            <h3 id="totalTidak">0</h3>
+          </article>
         </section>
 
-        <section id="page-dashboard" class="page-section space-y-6">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="p-6 md:p-8 bg-gradient-to-br from-blue-600 to-slate-900 text-white">
-              <p class="text-sm uppercase tracking-wide text-blue-100 font-semibold">Aplikasi Sistem Pakar</p>
-              <h2 class="text-2xl md:text-4xl font-bold mt-2">Rekomendasi Kelayakan Awal Penerima PKH</h2>
-              <p class="text-blue-100 mt-3 max-w-3xl">Aplikasi ini membantu petugas memasukkan data warga, menghitung bobot kemiskinan, menjalankan metode forward chaining, dan menghasilkan rekomendasi awal penerima Program Keluarga Harapan.</p>
-              <div class="mt-5 flex flex-wrap gap-3">
-                <button data-page="input" class="open-page px-5 py-3 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50">Mulai Input Data</button>
-                <button data-page="weight" class="open-page px-5 py-3 rounded-xl bg-blue-500 text-white font-bold hover:bg-blue-400">Lihat Bobot</button>
+        <section id="page-dashboard" class="page-section">
+          <div class="hero-card">
+            <div class="hero-content">
+              <p class="section-label">Aplikasi Pelayanan Sosial Desa</p>
+              <h2>Rekomendasi Kelayakan Awal Penerima PKH</h2>
+              <p>Aplikasi ini membantu petugas desa memasukkan data warga, menghitung bobot prioritas, menjalankan metode forward chaining, dan menghasilkan rekomendasi awal calon penerima Program Keluarga Harapan.</p>
+              <div class="hero-actions">
+                <button data-page="input" class="btn btn-primary open-page">Mulai Input Data</button>
+                <button data-page="weight" class="btn btn-secondary open-page">Lihat Bobot</button>
               </div>
+            </div>
+            <div class="hero-panel">
+              <h3>Informasi Sistem</h3>
+              <ul>
+                <li>Metode: Forward Chaining</li>
+                <li>Basis: Sistem Pakar AI Simbolik</li>
+                <li>Output: Skor dan Status Rekomendasi</li>
+                <li>Pengguna: Admin atau Petugas Desa</li>
+              </ul>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-              <h3 class="font-bold text-lg mb-2">Tujuan Aplikasi</h3>
-              <p class="text-sm text-slate-600">Membantu proses skrining awal calon penerima PKH berdasarkan data sosial ekonomi dan komponen PKH.</p>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-              <h3 class="font-bold text-lg mb-2">Metode</h3>
-              <p class="text-sm text-slate-600">Sistem menggunakan forward chaining. Fakta dari data warga dicocokkan dengan aturan sampai menghasilkan rekomendasi.</p>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-              <h3 class="font-bold text-lg mb-2">Output</h3>
-              <p class="text-sm text-slate-600">Output sistem berupa skor, komponen PKH, status rekomendasi, dan rincian bobot yang menjadi alasan keputusan.</p>
-            </div>
+          <div class="info-grid">
+            <article class="info-card">
+              <h3>Tujuan Aplikasi</h3>
+              <p>Membantu skrining awal calon penerima PKH secara lebih rapi, cepat, dan terarah.</p>
+            </article>
+            <article class="info-card">
+              <h3>Metode</h3>
+              <p>Forward chaining mencocokkan fakta warga dengan aturan sampai sistem menemukan rekomendasi.</p>
+            </article>
+            <article class="info-card">
+              <h3>Output</h3>
+              <p>Sistem menampilkan skor, komponen PKH, status rekomendasi, dan rincian bobot.</p>
+            </article>
           </div>
 
-          <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-            <h3 class="text-lg font-bold mb-4">Alur Penggunaan</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
-              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                <p class="font-bold">1. Input Data</p>
-                <p class="text-slate-600 mt-1">Admin mengisi identitas dan kondisi sosial ekonomi warga.</p>
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Alur Penggunaan</h3>
+            </div>
+            <div class="step-grid">
+              <div class="step-card">
+                <span>1</span>
+                <h4>Input Data</h4>
+                <p>Petugas mengisi identitas dan kondisi sosial ekonomi warga.</p>
               </div>
-              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                <p class="font-bold">2. Proses Aturan</p>
-                <p class="text-slate-600 mt-1">Sistem membaca fakta dan menjalankan aturan forward chaining.</p>
+              <div class="step-card">
+                <span>2</span>
+                <h4>Proses Aturan</h4>
+                <p>Sistem membaca fakta dan menjalankan aturan forward chaining.</p>
               </div>
-              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                <p class="font-bold">3. Hitung Bobot</p>
-                <p class="text-slate-600 mt-1">Setiap kriteria diberi skor sesuai tingkat prioritas.</p>
+              <div class="step-card">
+                <span>3</span>
+                <h4>Hitung Bobot</h4>
+                <p>Setiap kriteria mendapat skor sesuai tingkat prioritas.</p>
               </div>
-              <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                <p class="font-bold">4. Rekomendasi</p>
-                <p class="text-slate-600 mt-1">Sistem menampilkan status layak, perlu verifikasi, atau tidak prioritas.</p>
+              <div class="step-card">
+                <span>4</span>
+                <h4>Rekomendasi</h4>
+                <p>Sistem menampilkan status layak, verifikasi, atau tidak prioritas.</p>
               </div>
             </div>
           </div>
         </section>
 
         <section id="page-input" class="page-section hidden">
-          <form id="formWarga" class="bg-white rounded-2xl border border-slate-200 p-5 md:p-6 shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-5">
+          <form id="formWarga" class="panel form-panel">
+            <div class="panel-header form-header">
               <div>
-                <h2 class="text-xl font-bold">Input Data Warga</h2>
-                <p class="text-sm text-slate-500 mt-1">Isi data warga. Sistem akan menghitung bobot secara otomatis.</p>
+                <h3>Input Data Warga</h3>
+                <p>Isi data warga. Sistem akan menghitung bobot secara otomatis.</p>
               </div>
-              <button id="btnResetForm" type="button" class="px-4 py-2 rounded-xl bg-slate-200 text-slate-800 font-semibold hover:bg-slate-300">Reset Form</button>
+              <button id="btnResetForm" type="button" class="btn btn-muted">Reset Form</button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-sm font-semibold mb-1">Nama Warga</label>
-                <input id="nama" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nama Warga</label>
+                <input id="nama" type="text" required />
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">NIK</label>
-                <input id="nik" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              <div class="form-group">
+                <label>NIK</label>
+                <input id="nik" type="text" required />
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">RT</label>
-                <input id="rt" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              <div class="form-group">
+                <label>RT</label>
+                <input id="rt" type="text" required />
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">Umur</label>
-                <input id="umur" type="number" min="0" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              <div class="form-group">
+                <label>Umur</label>
+                <input id="umur" type="number" min="0" required />
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">Penghasilan per Bulan</label>
-                <select id="penghasilan" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div class="form-group">
+                <label>Penghasilan per Bulan</label>
+                <select id="penghasilan">
                   <option value="kurang_800">Kurang dari Rp800.000</option>
                   <option value="800_1000">Rp800.000 sampai Rp1.000.000</option>
                   <option value="1000_2000">Di atas Rp1.000.000 sampai Rp2.000.000</option>
                   <option value="lebih_2000">Di atas Rp2.000.000</option>
                 </select>
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">Jumlah Tanggungan Keluarga</label>
-                <input id="tanggungan" type="number" min="0" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              <div class="form-group">
+                <label>Jumlah Tanggungan Keluarga</label>
+                <input id="tanggungan" type="number" min="0" required />
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">Kondisi Rumah</label>
-                <select id="kondisiRumah" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div class="form-group">
+                <label>Kondisi Rumah</label>
+                <select id="kondisiRumah">
                   <option value="tidak_layak">Tidak Layak</option>
                   <option value="layak">Layak</option>
                 </select>
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">Aset Produktif</label>
-                <select id="asetProduktif" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div class="form-group">
+                <label>Aset Produktif</label>
+                <select id="asetProduktif">
                   <option value="tidak_ada">Tidak Ada</option>
                   <option value="ada">Ada</option>
                 </select>
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">Kendaraan</label>
-                <select id="kendaraan" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div class="form-group">
+                <label>Kendaraan</label>
+                <select id="kendaraan">
                   <option value="tidak_ada">Tidak Ada</option>
                   <option value="sepeda">Sepeda</option>
                   <option value="motor">Motor</option>
                   <option value="mobil">Mobil</option>
                 </select>
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold mb-1">Status DTKS</label>
-                <select id="dtks" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div class="form-group">
+                <label>Status DTKS</label>
+                <select id="dtks">
                   <option value="terdaftar">Terdaftar</option>
                   <option value="belum">Belum Terdaftar</option>
                 </select>
               </div>
             </div>
 
-            <div class="mt-5 border border-slate-200 rounded-2xl p-4 bg-slate-50">
-              <p class="text-sm font-bold mb-3">Komponen PKH</p>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <label class="flex items-center gap-2 text-sm"><input id="ibuHamil" type="checkbox" class="w-4 h-4" /> Ibu hamil atau menyusui</label>
-                <label class="flex items-center gap-2 text-sm"><input id="balita" type="checkbox" class="w-4 h-4" /> Anak usia 0 sampai 6 tahun</label>
-                <label class="flex items-center gap-2 text-sm"><input id="anakSekolah" type="checkbox" class="w-4 h-4" /> Anak sekolah SD, SMP, atau SMA</label>
-                <label class="flex items-center gap-2 text-sm"><input id="disabilitas" type="checkbox" class="w-4 h-4" /> Penyandang disabilitas berat</label>
+            <div class="component-box">
+              <h4>Komponen PKH</h4>
+              <div class="checkbox-grid">
+                <label><input id="ibuHamil" type="checkbox" /> Ibu hamil atau menyusui</label>
+                <label><input id="balita" type="checkbox" /> Anak usia 0 sampai 6 tahun</label>
+                <label><input id="anakSekolah" type="checkbox" /> Anak sekolah SD, SMP, atau SMA</label>
+                <label><input id="disabilitas" type="checkbox" /> Penyandang disabilitas berat</label>
               </div>
-              <p class="text-xs text-slate-500 mt-3">Komponen lansia dihitung otomatis jika umur minimal 60 tahun.</p>
+              <p>Komponen lansia dihitung otomatis jika umur minimal 60 tahun.</p>
             </div>
 
-            <div id="previewBox" class="hidden mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-              <h3 class="font-bold text-blue-900 mb-2">Preview Hasil Input Terakhir</h3>
-              <div id="previewContent" class="text-sm text-blue-900"></div>
+            <div id="previewBox" class="preview-box hidden">
+              <h4>Preview Hasil Input Terakhir</h4>
+              <div id="previewContent"></div>
             </div>
 
-            <div class="mt-5 flex flex-col sm:flex-row gap-3">
-              <button type="submit" class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">Simpan Data</button>
-              <button type="button" data-page="result" class="open-page px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800">Lihat Hasil</button>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Simpan Data</button>
+              <button type="button" data-page="result" class="btn btn-dark open-page">Lihat Hasil</button>
             </div>
           </form>
         </section>
 
-        <section id="page-search" class="page-section hidden space-y-5">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <h2 class="text-xl font-bold">Cari Data Warga</h2>
-            <p class="text-sm text-slate-500 mt-1">Cari berdasarkan nama, NIK, RT, atau status rekomendasi.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" class="md:col-span-2 px-3 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <select id="filterStatus" class="px-3 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <section id="page-search" class="page-section hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Cari Data Warga</h3>
+                <p>Cari berdasarkan nama, NIK, RT, atau status rekomendasi.</p>
+              </div>
+            </div>
+            <div class="search-grid">
+              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" />
+              <select id="filterStatus">
                 <option value="SEMUA">Semua Status</option>
                 <option value="Layak Diusulkan">Layak Diusulkan</option>
                 <option value="Perlu Verifikasi">Perlu Verifikasi</option>
@@ -245,71 +263,83 @@
               </select>
             </div>
           </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <h3 class="font-bold mb-3">Hasil Pencarian</h3>
-            <div id="searchCards" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+          <div class="panel mt-20">
+            <div class="panel-header">
+              <h3>Hasil Pencarian</h3>
+            </div>
+            <div id="searchCards" class="search-cards"></div>
           </div>
         </section>
 
         <section id="page-result" class="page-section hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <div class="panel">
+            <div class="panel-header form-header">
               <div>
-                <h2 class="text-xl font-bold">Hasil Rekomendasi</h2>
-                <p class="text-sm text-slate-500">Tabel data warga dan hasil proses forward chaining.</p>
+                <h3>Hasil Rekomendasi</h3>
+                <p>Tabel data warga dan hasil proses forward chaining.</p>
               </div>
-              <button data-page="input" class="open-page px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">Tambah Data</button>
+              <button data-page="input" class="btn btn-primary open-page">Tambah Data</button>
             </div>
-            <div class="overflow-auto rounded-xl border border-slate-200">
-              <table class="min-w-full text-sm">
-                <thead class="bg-slate-100 text-slate-700 sticky top-0">
+            <div class="table-wrap">
+              <table>
+                <thead>
                   <tr>
-                    <th class="text-left px-3 py-3 font-semibold">No</th>
-                    <th class="text-left px-3 py-3 font-semibold">Nama</th>
-                    <th class="text-left px-3 py-3 font-semibold">NIK</th>
-                    <th class="text-left px-3 py-3 font-semibold">RT</th>
-                    <th class="text-left px-3 py-3 font-semibold">Skor</th>
-                    <th class="text-left px-3 py-3 font-semibold">Komponen</th>
-                    <th class="text-left px-3 py-3 font-semibold">Rekomendasi</th>
-                    <th class="text-left px-3 py-3 font-semibold">Rincian Bobot</th>
-                    <th class="text-left px-3 py-3 font-semibold">Aksi</th>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>NIK</th>
+                    <th>RT</th>
+                    <th>Skor</th>
+                    <th>Komponen</th>
+                    <th>Rekomendasi</th>
+                    <th>Rincian Bobot</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="resultBody" class="divide-y divide-slate-200 bg-white"></tbody>
+                <tbody id="resultBody"></tbody>
               </table>
             </div>
           </div>
         </section>
 
         <section id="page-weight" class="page-section hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <h2 class="text-xl font-bold">Bobot Penilaian</h2>
-            <p class="text-sm text-slate-500 mt-1">Bobot digunakan untuk menghitung skor prioritas setiap warga.</p>
-            <div id="weightBox" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 text-sm mt-5"></div>
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Bobot Penilaian</h3>
+                <p>Bobot digunakan untuk menghitung skor prioritas setiap warga.</p>
+              </div>
+            </div>
+            <div id="weightBox" class="weight-grid"></div>
           </div>
         </section>
 
-        <section id="page-rule" class="page-section hidden space-y-5">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <h2 class="text-xl font-bold">Aturan Forward Chaining</h2>
-            <p class="text-sm text-slate-500 mt-1">Sistem membaca fakta, menambahkan bobot, lalu menentukan rekomendasi.</p>
-            <div id="ruleBox" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-5"></div>
+        <section id="page-rule" class="page-section hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Aturan Forward Chaining</h3>
+                <p>Sistem membaca fakta, menambahkan bobot, lalu menentukan rekomendasi.</p>
+              </div>
+            </div>
+            <div id="ruleBox" class="rule-grid"></div>
           </div>
 
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <h2 class="text-xl font-bold mb-4">Aturan Keputusan</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-              <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-                <h3 class="font-bold text-emerald-800">Layak Diusulkan</h3>
-                <p class="text-emerald-700 mt-1">Skor minimal 70, terdaftar DTKS, dan memiliki minimal satu komponen PKH.</p>
+          <div class="panel mt-20">
+            <div class="panel-header">
+              <h3>Aturan Keputusan</h3>
+            </div>
+            <div class="decision-grid">
+              <div class="decision-card success">
+                <h4>Layak Diusulkan</h4>
+                <p>Skor minimal 70, terdaftar DTKS, dan memiliki minimal satu komponen PKH.</p>
               </div>
-              <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
-                <h3 class="font-bold text-amber-800">Perlu Verifikasi</h3>
-                <p class="text-amber-700 mt-1">Skor 50 sampai 69, atau data potensial tetapi DTKS belum terdaftar.</p>
+              <div class="decision-card warning">
+                <h4>Perlu Verifikasi</h4>
+                <p>Skor 50 sampai 69, atau data potensial tetapi DTKS belum terdaftar.</p>
               </div>
-              <div class="rounded-xl border border-rose-200 bg-rose-50 p-4">
-                <h3 class="font-bold text-rose-800">Tidak Prioritas</h3>
-                <p class="text-rose-700 mt-1">Skor di bawah 50, tidak memiliki komponen PKH, atau ada indikator ekonomi kuat.</p>
+              <div class="decision-card danger">
+                <h4>Tidak Prioritas</h4>
+                <p>Skor di bawah 50, tidak memiliki komponen PKH, atau ada indikator ekonomi kuat.</p>
               </div>
             </div>
           </div>
@@ -354,11 +384,15 @@
       rule: ["Aturan Sistem", "Basis aturan forward chaining"]
     };
 
-    let results = [];
+    let results = JSON.parse(localStorage.getItem("pkhResults")) || [];
     let editIndex = null;
     let currentPage = "dashboard";
 
     const el = id => document.getElementById(id);
+
+    function saveLocal() {
+      localStorage.setItem("pkhResults", JSON.stringify(results));
+    }
 
     function labelFromValue(value, map) {
       return map[value] || value;
@@ -371,40 +405,29 @@
     function closeSidebar() {
       const sidebar = el("sidebar");
       if (isDesktop()) {
-        sidebar.style.width = "0px";
+        sidebar.classList.add("collapsed");
       } else {
-        sidebar.classList.add("-translate-x-full");
-        el("overlay").classList.add("hidden");
+        sidebar.classList.remove("open");
+        el("overlay").classList.remove("show");
       }
     }
 
     function openSidebar() {
       const sidebar = el("sidebar");
       if (isDesktop()) {
-        sidebar.style.width = "18rem";
+        sidebar.classList.remove("collapsed");
       } else {
-        sidebar.style.width = "18rem";
-        sidebar.classList.remove("-translate-x-full");
-        el("overlay").classList.remove("hidden");
+        sidebar.classList.add("open");
+        el("overlay").classList.add("show");
       }
     }
 
     function toggleSidebar() {
       const sidebar = el("sidebar");
       if (isDesktop()) {
-        const isClosed = sidebar.style.width === "0px";
-        if (isClosed) {
-          openSidebar();
-        } else {
-          closeSidebar();
-        }
+        sidebar.classList.toggle("collapsed");
       } else {
-        const isClosed = sidebar.classList.contains("-translate-x-full");
-        if (isClosed) {
-          openSidebar();
-        } else {
-          closeSidebar();
-        }
+        sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
       }
     }
 
@@ -414,17 +437,13 @@
       el(`page-${page}`).classList.remove("hidden");
 
       document.querySelectorAll(".nav-btn").forEach(button => {
-        const active = button.dataset.page === page;
-        button.className = active
-          ? "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold bg-blue-600 text-white"
-          : "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold hover:bg-slate-800 text-slate-200";
+        button.classList.toggle("active", button.dataset.page === page);
       });
 
       el("pageTitle").textContent = pageInfo[page][0];
       el("pageSubtitle").textContent = pageInfo[page][1];
-      if (!isDesktop()) {
-        closeSidebar();
-      }
+
+      if (!isDesktop()) closeSidebar();
       renderAll();
     }
 
@@ -552,28 +571,28 @@
     }
 
     function statusClass(status) {
-      if (status === "Layak Diusulkan") return "bg-emerald-100 text-emerald-700";
-      if (status === "Perlu Verifikasi") return "bg-amber-100 text-amber-700";
-      return "bg-rose-100 text-rose-700";
+      if (status === "Layak Diusulkan") return "status success";
+      if (status === "Perlu Verifikasi") return "status warning";
+      return "status danger";
     }
 
     function renderWeights() {
       el("weightBox").innerHTML = weights.map(item => `
-        <div class="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div class="weight-card">
           <div>
-            <p class="font-bold text-slate-900">${item.code}</p>
-            <p class="text-slate-600 mt-1">${item.name}</p>
+            <h4>${item.code}</h4>
+            <p>${item.name}</p>
           </div>
-          <span class="shrink-0 rounded-full px-3 py-1 text-xs font-bold ${item.value < 0 ? "bg-rose-100 text-rose-700" : "bg-blue-100 text-blue-700"}">${item.value > 0 ? "+" : ""}${item.value}</span>
+          <span class="weight-value ${item.value < 0 ? "minus" : "plus"}">${item.value > 0 ? "+" : ""}${item.value}</span>
         </div>
       `).join("");
     }
 
     function renderRules() {
       el("ruleBox").innerHTML = rules.map((rule, index) => `
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="font-bold text-slate-900">R${index + 1}</p>
-          <p class="text-sm text-slate-600 mt-1">${rule}</p>
+        <div class="rule-card">
+          <h4>R${index + 1}</h4>
+          <p>${rule}</p>
         </div>
       `).join("");
     }
@@ -592,7 +611,7 @@
         <p><strong>${item.nama}</strong> memperoleh skor <strong>${item.score}</strong>.</p>
         <p>Status rekomendasi: <strong>${item.recommendation}</strong>.</p>
         <p>Komponen: ${item.components}.</p>
-        <p class="mt-1">Rincian: ${item.details}.</p>
+        <p>Rincian: ${item.details}.</p>
       `;
     }
 
@@ -612,27 +631,27 @@
       el("searchCards").innerHTML = filtered.map(item => {
         const realIndex = results.indexOf(item);
         return `
-          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div class="flex items-start justify-between gap-3">
+          <article class="search-card">
+            <div class="search-card-head">
               <div>
-                <h3 class="font-bold text-lg">${item.nama}</h3>
-                <p class="text-sm text-slate-500">NIK: ${item.nik}</p>
-                <p class="text-sm text-slate-500">RT: ${item.rt} | Umur: ${item.umur} tahun</p>
+                <h3>${item.nama}</h3>
+                <p>NIK: ${item.nik}</p>
+                <p>RT: ${item.rt} | Umur: ${item.umur} tahun</p>
               </div>
-              <span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass(item.recommendation)}">${item.recommendation}</span>
+              <span class="${statusClass(item.recommendation)}">${item.recommendation}</span>
             </div>
-            <div class="mt-3 text-sm text-slate-600">
+            <div class="search-card-body">
               <p><strong>Skor:</strong> ${item.score}</p>
               <p><strong>Komponen:</strong> ${item.components}</p>
-              <p class="mt-1"><strong>Rincian:</strong> ${item.details}</p>
+              <p><strong>Rincian:</strong> ${item.details}</p>
             </div>
-            <div class="flex gap-2 mt-4">
-              <button onclick="editData(${realIndex})" class="px-3 py-2 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600">Edit</button>
-              <button onclick="deleteData(${realIndex})" class="px-3 py-2 rounded-lg bg-rose-600 text-white font-semibold hover:bg-rose-700">Hapus</button>
+            <div class="card-actions">
+              <button onclick="editData(${realIndex})" class="btn btn-warning">Edit</button>
+              <button onclick="deleteData(${realIndex})" class="btn btn-danger">Hapus</button>
             </div>
-          </div>
+          </article>
         `;
-      }).join("") || `<div class="col-span-full text-center py-8 text-slate-500">Data tidak ditemukan.</div>`;
+      }).join("") || `<div class="empty-state">Data tidak ditemukan.</div>`;
     }
 
     function renderTable() {
@@ -644,25 +663,27 @@
       };
 
       el("resultBody").innerHTML = results.map((item, index) => `
-        <tr class="hover:bg-slate-50 align-top">
-          <td class="px-3 py-3">${index + 1}</td>
-          <td class="px-3 py-3 min-w-[160px]">
-            <p class="font-semibold">${item.nama}</p>
-            <p class="text-xs text-slate-500">Umur ${item.umur} tahun</p>
-            <p class="text-xs text-slate-500">Penghasilan ${labelFromValue(item.penghasilan, incomeLabels)}</p>
+        <tr>
+          <td>${index + 1}</td>
+          <td>
+            <strong>${item.nama}</strong>
+            <small>Umur ${item.umur} tahun</small>
+            <small>Penghasilan ${labelFromValue(item.penghasilan, incomeLabels)}</small>
           </td>
-          <td class="px-3 py-3 whitespace-nowrap">${item.nik}</td>
-          <td class="px-3 py-3">${item.rt}</td>
-          <td class="px-3 py-3 font-bold">${item.score}</td>
-          <td class="px-3 py-3 min-w-[180px]">${item.components}</td>
-          <td class="px-3 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass(item.recommendation)}">${item.recommendation}</span></td>
-          <td class="px-3 py-3 min-w-[280px] text-slate-600">${item.details}</td>
-          <td class="px-3 py-3 min-w-[120px]">
-            <button onclick="editData(${index})" class="block w-full mb-2 px-3 py-1 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600">Edit</button>
-            <button onclick="deleteData(${index})" class="block w-full px-3 py-1 rounded-lg bg-rose-600 text-white font-semibold hover:bg-rose-700">Hapus</button>
+          <td>${item.nik}</td>
+          <td>${item.rt}</td>
+          <td><strong>${item.score}</strong></td>
+          <td>${item.components}</td>
+          <td><span class="${statusClass(item.recommendation)}">${item.recommendation}</span></td>
+          <td>${item.details}</td>
+          <td>
+            <div class="table-actions">
+              <button onclick="editData(${index})" class="btn btn-warning">Edit</button>
+              <button onclick="deleteData(${index})" class="btn btn-danger">Hapus</button>
+            </div>
           </td>
         </tr>
-      `).join("") || `<tr><td colspan="9" class="px-3 py-6 text-center text-slate-500">Belum ada data. Silakan input data warga.</td></tr>`;
+      `).join("") || `<tr><td colspan="9" class="empty-table">Belum ada data. Silakan input data warga.</td></tr>`;
     }
 
     function renderAll() {
@@ -688,6 +709,7 @@
         results[editIndex] = result;
       }
 
+      saveLocal();
       renderPreview(result);
       renderAll();
       resetForm();
@@ -706,19 +728,9 @@
     function deleteData(index) {
       if (!confirm("Hapus data ini?")) return;
       results.splice(index, 1);
+      saveLocal();
       renderAll();
     }
-
-    function resetAll() {
-      if (!confirm("Hapus semua data?")) return;
-      results = [];
-      editIndex = null;
-      el("previewBox").classList.add("hidden");
-      resetForm();
-      renderAll();
-      showPage("dashboard");
-    }
-
 
     function exportCsv() {
       const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Kondisi Rumah", "Aset Produktif", "Kendaraan", "DTKS", "Komponen", "Skor", "Rekomendasi", "Rincian Bobot"];
@@ -765,24 +777,18 @@
 
     el("btnMenu").addEventListener("click", toggleSidebar);
     el("overlay").addEventListener("click", closeSidebar);
-    window.addEventListener("resize", () => {
-      const sidebar = el("sidebar");
-      if (isDesktop()) {
-        el("overlay").classList.add("hidden");
-        sidebar.classList.remove("-translate-x-full");
-        if (sidebar.style.width !== "0px") {
-          sidebar.style.width = "18rem";
-        }
-      } else {
-        sidebar.style.width = "18rem";
-        sidebar.classList.add("-translate-x-full");
-      }
-    });
     el("formWarga").addEventListener("submit", saveData);
     el("btnResetForm").addEventListener("click", resetForm);
     el("btnExport").addEventListener("click", exportCsv);
     el("searchInput").addEventListener("input", renderAll);
     el("filterStatus").addEventListener("change", renderAll);
+
+    window.addEventListener("resize", () => {
+      if (isDesktop()) {
+        el("overlay").classList.remove("show");
+        el("sidebar").classList.remove("open");
+      }
+    });
 
     renderWeights();
     renderRules();
