@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Petugas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="page-login">
+    <form id="formLogin" class="panel">
+      <h3>Login Petugas</h3>
+      <div class="form-group">
+        <label>Username</label>
+        <input id="loginUser" type="text" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input id="loginPass" type="password" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+  </section>
+
+  <script>
+    const loginForm = document.getElementById("formLogin");
+    loginForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const user = document.getElementById("loginUser").value;
+      const pass = document.getElementById("loginPass").value;
+      if(user === "petugas" && pass === "1234") {
+        // Redirect ke halaman index.html setelah login berhasil
+        window.location.href = "index.html";
+      } else {
+        alert("Username atau password salah!");
+      }
+    });
+  </script>
+</body>
+</html>
