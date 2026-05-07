@@ -3,44 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aplikasi PKH Forward Chaining - Hasil Akhir</title>
+  <title>Aplikasi PKH Forward Chaining</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <section id="loginPage" class="login-page">
     <div class="login-card">
-      <div class="login-brand">
-        <div class="brand-logo">KD</div>
-        <div>
-          <h1>Kantor Desa</h1>
-          <p>Sistem Rekomendasi PKH</p>
-        </div>
-      </div>
+      <div class="login-logo">KD</div>
+      <h1>Login Petugas</h1>
+      <p>Masuk untuk mengelola data warga dan melakukan verifikasi manual rekomendasi PKH.</p>
 
-      <form id="formLogin" class="login-form">
-        <h2>Login Petugas</h2>
-        <p>Masuk sebagai petugas atau admin untuk menginput data, melihat rekomendasi sistem, mengisi rekomendasi manual, dan menghasilkan keputusan akhir.</p>
-
+      <form id="loginForm" class="login-form">
         <div class="form-group">
           <label>Username</label>
-          <input id="loginUsername" type="text" placeholder="Contoh: petugas" required />
+          <input id="username" type="text" placeholder="petugas" required />
         </div>
-
         <div class="form-group">
           <label>Password</label>
-          <input id="loginPassword" type="password" placeholder="Masukkan password" required />
+          <input id="password" type="password" placeholder="pkh123" required />
         </div>
-
-        <p id="loginError" class="login-error hidden"></p>
-
-        <button type="submit" class="btn btn-primary">Masuk</button>
-
-        <div class="login-help">
-          <strong>Akun contoh:</strong>
-          <span>petugas / pkh123</span>
-          <span>admin / admin123</span>
-        </div>
+        <button type="submit" class="btn btn-primary full-width">Masuk</button>
       </form>
+
+      <div class="login-info">
+        <strong>Akun Demo</strong>
+        <span>petugas / pkh123</span>
+        <span>admin / admin123</span>
+      </div>
     </div>
   </section>
 
@@ -83,7 +72,7 @@
 
       <div class="sidebar-footer">
         <button id="btnExport" class="btn btn-export" disabled>Export CSV</button>
-        <p>Rekomendasi sistem divalidasi manual sampai keluar hasil akhir.</p>
+        <p>Rekomendasi sistem berasal dari forward chaining. Hasil akhir ditentukan setelah verifikasi manual petugas.</p>
       </div>
     </aside>
 
@@ -99,8 +88,7 @@
           </div>
         </div>
         <div class="topbar-actions">
-          <div class="topbar-badge">Desa Digital</div>
-          <div id="loggedUser" class="user-badge">Petugas</div>
+          <div id="userBadge" class="topbar-badge">Petugas</div>
           <button id="btnLogout" class="btn btn-muted btn-logout">Logout</button>
         </div>
       </header>
@@ -112,16 +100,16 @@
             <h3 id="totalData">0</h3>
           </article>
           <article class="summary-card green">
-            <p>Hasil Akhir Layak</p>
+            <p>Layak Sistem</p>
             <h3 id="totalLayak">0</h3>
           </article>
           <article class="summary-card yellow">
-            <p>Menunggu Verifikasi</p>
+            <p>Perlu Verifikasi</p>
             <h3 id="totalVerifikasi">0</h3>
           </article>
           <article class="summary-card red">
-            <p>Hasil Akhir Tidak Layak</p>
-            <h3 id="totalTidak">0</h3>
+            <p>Belum Manual</p>
+            <h3 id="totalBelumManual">0</h3>
           </article>
         </section>
 
@@ -130,62 +118,64 @@
             <div class="hero-content">
               <p class="section-label">Aplikasi Pelayanan Sosial Desa</p>
               <h2>Rekomendasi Kelayakan Awal Penerima PKH</h2>
-              <p>Aplikasi ini membantu petugas desa memasukkan data warga, menghitung bobot prioritas, menjalankan metode forward chaining, dan menghasilkan rekomendasi awal calon penerima Program Keluarga Harapan.</p>
+              <p>Aplikasi ini membantu petugas desa memasukkan data warga, menjalankan metode forward chaining, menampilkan rekomendasi sistem, lalu menyediakan verifikasi manual petugas dengan keterangan dan hasil akhir.</p>
               <div class="hero-actions">
                 <button data-page="input" class="btn btn-primary open-page">Mulai Input Data</button>
-                <button data-page="weight" class="btn btn-secondary open-page">Lihat Bobot</button>
+                <button data-page="result" class="btn btn-secondary open-page">Lihat Hasil</button>
               </div>
             </div>
             <div class="hero-panel">
-              <h3>Informasi Sistem</h3>
+              <h3>Alur Sesuai Arahan</h3>
               <ul>
-                <li>Metode: Forward Chaining</li>
-                <li>Basis: Sistem Pakar AI Simbolik</li>
-                <li>Output: Skor, Rekomendasi Sistem, Rekomendasi Manual, Keterangan, dan Hasil Akhir</li>
-                <li>Pengguna: Admin atau Petugas Desa</li>
+                <li>Petugas login terlebih dahulu</li>
+                <li>Input data warga</li>
+                <li>Sistem menampilkan rekomendasi sistem</li>
+                <li>Petugas klik Verifikasi Manual/Edit</li>
+                <li>Petugas mengisi manual dan keterangan</li>
+                <li>Sistem menampilkan hasil akhir</li>
               </ul>
             </div>
           </div>
 
           <div class="info-grid">
             <article class="info-card">
-              <h3>Tujuan Aplikasi</h3>
-              <p>Membantu skrining awal calon penerima PKH secara lebih rapi, cepat, dan terarah.</p>
+              <h3>Rekomendasi Sistem</h3>
+              <p>Hasil otomatis dari forward chaining berdasarkan input data warga, skor, DTKS, dan komponen PKH.</p>
             </article>
             <article class="info-card">
-              <h3>Metode</h3>
-              <p>Forward chaining mencocokkan fakta warga dengan aturan sampai sistem menemukan rekomendasi.</p>
+              <h3>Rekomendasi Manual</h3>
+              <p>Diisi setelah hasil sistem muncul. Petugas memilih Layak, Tidak Layak, atau Perlu Verifikasi Lanjutan.</p>
             </article>
             <article class="info-card">
-              <h3>Output</h3>
-              <p>Sistem menampilkan skor, komponen PKH, rekomendasi sistem, rekomendasi manual, keterangan petugas, hasil akhir, dan rincian bobot.</p>
+              <h3>Hasil Akhir</h3>
+              <p>Keputusan akhir yang muncul dari gabungan hasil sistem, rekomendasi manual, dan keterangan petugas.</p>
             </article>
           </div>
 
-          <div class="panel">
+          <div class="panel mt-20">
             <div class="panel-header">
               <h3>Alur Penggunaan</h3>
             </div>
             <div class="step-grid">
               <div class="step-card">
                 <span>1</span>
+                <h4>Login Petugas</h4>
+                <p>Petugas masuk menggunakan akun yang tersedia.</p>
+              </div>
+              <div class="step-card">
+                <span>2</span>
                 <h4>Input Data</h4>
                 <p>Petugas mengisi identitas dan kondisi sosial ekonomi warga.</p>
               </div>
               <div class="step-card">
-                <span>2</span>
-                <h4>Proses Aturan</h4>
-                <p>Sistem membaca fakta dan menjalankan aturan forward chaining.</p>
-              </div>
-              <div class="step-card">
                 <span>3</span>
-                <h4>Hitung Bobot</h4>
-                <p>Setiap kriteria mendapat skor sesuai tingkat prioritas.</p>
+                <h4>Rekomendasi Sistem</h4>
+                <p>Forward chaining menghitung skor dan status sistem.</p>
               </div>
               <div class="step-card">
                 <span>4</span>
-                <h4>Hasil Akhir</h4>
-                <p>Petugas memberi rekomendasi manual dan keterangan, lalu sistem menampilkan hasil akhir.</p>
+                <h4>Verifikasi Manual</h4>
+                <p>Petugas mengisi keputusan manual dan keterangan.</p>
               </div>
             </div>
           </div>
@@ -196,7 +186,7 @@
             <div class="panel-header form-header">
               <div>
                 <h3>Input Data Warga</h3>
-                <p>Isi data warga. Sistem akan menghitung bobot secara otomatis.</p>
+                <p>Isi data warga terlebih dahulu. Setelah disimpan, sistem akan menampilkan rekomendasi sistem. Rekomendasi manual diisi setelah itu melalui tombol Verifikasi Manual/Edit.</p>
               </div>
               <button id="btnResetForm" type="button" class="btn btn-muted">Reset Form</button>
             </div>
@@ -274,34 +264,13 @@
               <p>Komponen lansia dihitung otomatis jika umur minimal 60 tahun.</p>
             </div>
 
-            <div class="component-box manual-box">
-              <h4>Rekomendasi Manual Petugas</h4>
-              <p class="manual-info">Bagian ini diisi oleh petugas sebagai validasi lapangan setelah sistem memberikan rekomendasi otomatis.</p>
-              <div class="form-grid manual-grid">
-                <div class="form-group">
-                  <label>Rekomendasi Manual</label>
-                  <select id="manualRecommendation" required>
-                    <option value="">Pilih rekomendasi manual</option>
-                    <option value="Layak">Layak</option>
-                    <option value="Tidak Layak">Tidak Layak</option>
-                    <option value="Perlu Verifikasi Lanjutan">Perlu Verifikasi Lanjutan</option>
-                  </select>
-                </div>
-                <div class="form-group form-group-wide">
-                  <label>Keterangan Petugas</label>
-                  <textarea id="manualNote" rows="3" required placeholder="Contoh: DTKS belum terdaftar, tetapi memiliki anak sekolah sehingga perlu pengecekan lapangan."></textarea>
-                </div>
-              </div>
-              <p>Rekomendasi manual dan keterangan wajib diisi agar sistem dapat memunculkan hasil akhir.</p>
-            </div>
-
             <div id="previewBox" class="preview-box hidden">
-              <h4>Preview Hasil Input Terakhir</h4>
+              <h4>Rekomendasi Sistem Berhasil Muncul</h4>
               <div id="previewContent"></div>
             </div>
 
             <div class="form-actions">
-              <button type="submit" class="btn btn-primary">Simpan Data</button>
+              <button type="submit" class="btn btn-primary">Simpan Data & Lihat Rekomendasi Sistem</button>
               <button type="button" data-page="result" class="btn btn-dark open-page">Lihat Hasil</button>
             </div>
           </form>
@@ -312,16 +281,16 @@
             <div class="panel-header">
               <div>
                 <h3>Cari Data Warga</h3>
-                <p>Cari berdasarkan nama, NIK, RT, atau status rekomendasi.</p>
+                <p>Cari berdasarkan nama, NIK, RT, rekomendasi sistem, manual, atau hasil akhir.</p>
               </div>
             </div>
             <div class="search-grid">
-              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT, rekomendasi, atau hasil akhir" />
+              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" />
               <select id="filterStatus">
-                <option value="SEMUA">Semua Status</option>
-                <option value="Layak">Layak / Layak Diusulkan</option>
-                <option value="Verifikasi">Perlu / Menunggu Verifikasi</option>
-                <option value="Tidak">Tidak Layak / Tidak Prioritas</option>
+                <option value="SEMUA">Semua Status Sistem</option>
+                <option value="Layak Diusulkan">Layak Diusulkan</option>
+                <option value="Perlu Verifikasi">Perlu Verifikasi</option>
+                <option value="Tidak Prioritas">Tidak Prioritas</option>
               </select>
             </div>
           </div>
@@ -338,7 +307,7 @@
             <div class="panel-header form-header">
               <div>
                 <h3>Hasil Rekomendasi</h3>
-                <p>Tabel data warga, rekomendasi sistem, rekomendasi manual, keterangan, dan hasil akhir.</p>
+                <p>Setelah rekomendasi sistem muncul, klik Verifikasi Manual/Edit untuk mengisi rekomendasi manual dan keterangan.</p>
               </div>
               <button data-page="input" class="btn btn-primary open-page">Tambah Data</button>
             </div>
@@ -354,7 +323,7 @@
                     <th>Komponen</th>
                     <th>Rekomendasi Sistem</th>
                     <th>Rekomendasi Manual</th>
-                    <th>Keterangan</th>
+                    <th>Keterangan Petugas</th>
                     <th>Hasil Akhir</th>
                     <th>Rincian Bobot</th>
                     <th>Aksi</th>
@@ -383,7 +352,7 @@
             <div class="panel-header">
               <div>
                 <h3>Aturan Forward Chaining</h3>
-                <p>Sistem membaca fakta, menambahkan bobot, lalu menentukan rekomendasi.</p>
+                <p>Sistem membaca fakta, menambahkan bobot, lalu menentukan rekomendasi sistem.</p>
               </div>
             </div>
             <div id="ruleBox" class="rule-grid"></div>
@@ -391,7 +360,7 @@
 
           <div class="panel mt-20">
             <div class="panel-header">
-              <h3>Aturan Keputusan</h3>
+              <h3>Aturan Keputusan Sistem</h3>
             </div>
             <div class="decision-grid">
               <div class="decision-card success">
@@ -411,13 +380,12 @@
 
           <div class="panel mt-20">
             <div class="panel-header">
-              <h3>Aturan Hasil Akhir</h3>
-              <p>Hasil akhir ditentukan dari rekomendasi manual petugas dan keterangan verifikasi.</p>
+              <h3>Aturan Hasil Akhir Manual</h3>
             </div>
             <div class="decision-grid">
               <div class="decision-card success">
                 <h4>Manual Layak</h4>
-                <p>Hasil akhir menjadi Layak Diusulkan Setelah Verifikasi Manual.</p>
+                <p>Hasil akhir menjadi Layak Diusulkan atau Layak Diusulkan Setelah Verifikasi Manual.</p>
               </div>
               <div class="decision-card warning">
                 <h4>Manual Perlu Verifikasi Lanjutan</h4>
@@ -431,6 +399,40 @@
           </div>
         </section>
       </main>
+    </div>
+  </div>
+
+  <div id="manualModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Verifikasi Manual Petugas</h3>
+          <p>Isi bagian ini setelah rekomendasi sistem muncul.</p>
+        </div>
+        <button id="btnCloseModal" class="modal-close" type="button" aria-label="Tutup">×</button>
+      </div>
+
+      <div id="manualSystemInfo" class="manual-system-info"></div>
+
+      <form id="manualForm" class="manual-form">
+        <div class="form-group">
+          <label>Rekomendasi Manual</label>
+          <select id="manualRecommendation" required>
+            <option value="">Pilih rekomendasi manual</option>
+            <option value="Layak">Layak</option>
+            <option value="Tidak Layak">Tidak Layak</option>
+            <option value="Perlu Verifikasi Lanjutan">Perlu Verifikasi Lanjutan</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Keterangan Petugas</label>
+          <textarea id="officerNote" rows="5" placeholder="Contoh: DTKS belum terdaftar, tetapi memiliki anak sekolah dan perlu pengecekan lapangan." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btnCancelManual" class="btn btn-muted">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Verifikasi Manual</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -453,126 +455,49 @@
       "IF penghasilan Rp800.000 sampai Rp1.000.000 THEN bobot ekonomi rentan +20",
       "IF rumah tidak layak THEN bobot kondisi hunian +20",
       "IF tanggungan keluarga minimal 4 orang THEN bobot beban keluarga +15",
+      "IF tanggungan keluarga 3 orang THEN bobot beban keluarga +10",
       "IF tidak memiliki aset produktif THEN bobot kepemilikan aset +15",
       "IF tidak memiliki kendaraan atau hanya sepeda THEN bobot akses kendaraan +10",
       "IF terdaftar DTKS THEN bobot validasi data +10",
       "IF memiliki komponen PKH THEN bobot komponen bantuan +20",
       "IF mobil AND rumah layak AND penghasilan tinggi THEN bobot ekonomi kuat -30",
-      "IF skor >= 70 AND DTKS terdaftar AND komponen PKH ada THEN layak diusulkan"
+      "IF skor >= 70 AND DTKS terdaftar AND komponen PKH ada THEN rekomendasi sistem layak diusulkan",
+      "IF rekomendasi manual diisi THEN sistem menampilkan hasil akhir"
     ];
 
     const pageInfo = {
       dashboard: ["Dashboard", "Informasi aplikasi rekomendasi PKH"],
-      input: ["Input Data", "Masukkan data warga dan validasi manual"],
+      input: ["Input Data", "Masukkan data warga terlebih dahulu"],
       search: ["Cari Data", "Temukan data warga yang sudah diinput"],
-      result: ["Hasil Rekomendasi", "Lihat rekomendasi sistem, manual, dan hasil akhir"],
+      result: ["Hasil Rekomendasi", "Lihat rekomendasi sistem dan verifikasi manual"],
       weight: ["Bobot Penilaian", "Daftar bobot setiap kriteria"],
-      rule: ["Aturan Sistem", "Basis aturan forward chaining"]
+      rule: ["Aturan Sistem", "Basis aturan forward chaining dan hasil akhir"]
     };
 
-    const accounts = [
-      { username: "petugas", password: "pkh123", role: "Petugas Desa" },
-      { username: "admin", password: "admin123", role: "Admin Desa" }
-    ];
+    const accounts = {
+      petugas: "pkh123",
+      admin: "admin123"
+    };
 
-    let loggedInUser = JSON.parse(sessionStorage.getItem("pkhLoginUser")) || null;
-    let results = JSON.parse(localStorage.getItem("pkhResults")) || [];
+    let results = JSON.parse(localStorage.getItem("pkhResultsStepManual")) || [];
     let editIndex = null;
+    let manualIndex = null;
     let currentPage = "dashboard";
+    let currentUser = localStorage.getItem("pkhCurrentUser") || "";
 
     const el = id => document.getElementById(id);
 
-    function showLogin() {
-      el("loginPage").classList.remove("hidden");
-      el("appShell").classList.add("hidden");
-      el("loginPassword").value = "";
-    }
-
-    function showApp() {
-      el("loginPage").classList.add("hidden");
-      el("appShell").classList.remove("hidden");
-      el("loggedUser").textContent = `${loggedInUser.role} (${loggedInUser.username})`;
-      showPage(currentPage || "dashboard");
-    }
-
-    function initAuth() {
-      if (loggedInUser) {
-        showApp();
-      } else {
-        showLogin();
-      }
-    }
-
-    function loginPetugas(event) {
-      event.preventDefault();
-
-      const username = el("loginUsername").value.trim();
-      const password = el("loginPassword").value.trim();
-      const found = accounts.find(account => account.username === username && account.password === password);
-
-      if (!found) {
-        el("loginError").textContent = "Username atau password salah.";
-        el("loginError").classList.remove("hidden");
-        return;
-      }
-
-      loggedInUser = {
-        username: found.username,
-        role: found.role,
-        loginAt: new Date().toISOString()
-      };
-
-      sessionStorage.setItem("pkhLoginUser", JSON.stringify(loggedInUser));
-      el("loginError").classList.add("hidden");
-      showApp();
-    }
-
-    function logoutPetugas() {
-      if (!confirm("Keluar dari aplikasi?")) return;
-      sessionStorage.removeItem("pkhLoginUser");
-      loggedInUser = null;
-      resetForm();
-      showLogin();
-    }
-
-    function getSystemRecommendation(item) {
-      return item.systemRecommendation || item.recommendation || "Tidak Prioritas";
-    }
-
-    function normalizeManualRecommendation(value) {
-      if (!value || value === "Ikuti Rekomendasi Sistem") return "Belum Diisi";
-      if (value === "Layak Diusulkan") return "Layak";
-      if (value === "Tidak Prioritas") return "Tidak Layak";
-      if (value === "Perlu Verifikasi") return "Perlu Verifikasi Lanjutan";
-      return value;
-    }
-
-    function getManualRecommendation(item) {
-      return normalizeManualRecommendation(item.manualRecommendation);
-    }
-
-    function getManualNote(item) {
-      return item.manualNote && item.manualNote.trim() ? item.manualNote : "-";
-    }
-
-    function determineFinalResult(manualRecommendation, systemRecommendation) {
-      const manual = normalizeManualRecommendation(manualRecommendation);
-
-      if (manual === "Layak") return "Layak Diusulkan Setelah Verifikasi Manual";
-      if (manual === "Tidak Layak") return "Tidak Layak Diusulkan";
-      if (manual === "Perlu Verifikasi Lanjutan") return "Menunggu Verifikasi Lanjutan";
-
-      if (systemRecommendation === "Layak Diusulkan") return "Layak Diusulkan Berdasarkan Sistem";
-      if (systemRecommendation === "Perlu Verifikasi") return "Menunggu Verifikasi Lapangan";
-      return "Tidak Layak Diusulkan";
-    }
-
-    function getFinalResult(item) {
-      return item.finalResult || determineFinalResult(item.manualRecommendation, getSystemRecommendation(item));
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function saveLocal() {
-      localStorage.setItem("pkhResults", JSON.stringify(results));
+      localStorage.setItem("pkhResultsStepManual", JSON.stringify(results));
     }
 
     function labelFromValue(value, map) {
@@ -612,6 +537,40 @@
       }
     }
 
+    function showApp() {
+      el("loginPage").classList.add("hidden");
+      el("appShell").classList.remove("hidden");
+      el("userBadge").textContent = `Login: ${currentUser}`;
+      showPage(currentPage);
+    }
+
+    function showLogin() {
+      el("loginPage").classList.remove("hidden");
+      el("appShell").classList.add("hidden");
+    }
+
+    function login(event) {
+      event.preventDefault();
+      const username = el("username").value.trim();
+      const password = el("password").value.trim();
+
+      if (accounts[username] !== password) {
+        alert("Username atau password salah.");
+        return;
+      }
+
+      currentUser = username;
+      localStorage.setItem("pkhCurrentUser", currentUser);
+      showApp();
+    }
+
+    function logout() {
+      if (!confirm("Keluar dari aplikasi?")) return;
+      currentUser = "";
+      localStorage.removeItem("pkhCurrentUser");
+      showLogin();
+    }
+
     function showPage(page) {
       currentPage = page;
       document.querySelectorAll(".page-section").forEach(section => section.classList.add("hidden"));
@@ -643,9 +602,7 @@
         ibuHamil: el("ibuHamil").checked,
         balita: el("balita").checked,
         anakSekolah: el("anakSekolah").checked,
-        disabilitas: el("disabilitas").checked,
-        manualRecommendation: el("manualRecommendation").value,
-        manualNote: el("manualNote").value.trim()
+        disabilitas: el("disabilitas").checked
       };
     }
 
@@ -664,15 +621,12 @@
       el("balita").checked = data.balita;
       el("anakSekolah").checked = data.anakSekolah;
       el("disabilitas").checked = data.disabilitas;
-      const manualValue = normalizeManualRecommendation(data.manualRecommendation);
-      el("manualRecommendation").value = manualValue === "Belum Diisi" ? "" : manualValue;
-      el("manualNote").value = data.manualNote || "";
     }
 
     function resetForm() {
       el("formWarga").reset();
       editIndex = null;
-      el("formWarga").querySelector("button[type='submit']").textContent = "Simpan Data";
+      el("formWarga").querySelector("button[type='submit']").textContent = "Simpan Data & Lihat Rekomendasi Sistem";
     }
 
     function infer(data) {
@@ -740,36 +694,45 @@
 
       score = Math.max(0, Math.min(100, score));
 
-      let recommendation = "Tidak Prioritas";
+      let systemRecommendation = "Tidak Prioritas";
       if (score >= 70 && hasComponent && data.dtks === "terdaftar") {
-        recommendation = "Layak Diusulkan";
+        systemRecommendation = "Layak Diusulkan";
       } else if (score >= 50 || (hasComponent && data.dtks === "belum")) {
-        recommendation = "Perlu Verifikasi";
+        systemRecommendation = "Perlu Verifikasi";
       }
-
-      const systemRecommendation = recommendation;
-      const manualRecommendation = data.manualRecommendation;
-      const finalResult = determineFinalResult(manualRecommendation, systemRecommendation);
 
       return {
         ...data,
         score,
         components: hasComponent ? components.join(", ") : "Belum ada komponen PKH",
         systemRecommendation,
-        recommendation: systemRecommendation,
-        manualRecommendation,
-        manualNote: data.manualNote || "-",
-        finalResult,
-        officer: loggedInUser ? `${loggedInUser.role} (${loggedInUser.username})` : "Petugas",
+        manualRecommendation: "",
+        officerNote: "",
+        finalResult: "Menunggu Verifikasi Manual",
+        verifiedBy: "",
+        verifiedAt: "",
         details: details.join("; ")
       };
     }
 
+    function getFinalResult(item) {
+      if (!item.manualRecommendation) return "Menunggu Verifikasi Manual";
+
+      if (item.manualRecommendation === "Layak") {
+        if (item.systemRecommendation === "Layak Diusulkan") return "Layak Diusulkan";
+        return "Layak Diusulkan Setelah Verifikasi Manual";
+      }
+
+      if (item.manualRecommendation === "Tidak Layak") {
+        return "Tidak Layak Diusulkan";
+      }
+
+      return "Menunggu Verifikasi Lanjutan";
+    }
+
     function statusClass(status) {
-      const text = String(status || "");
-      if (text.includes("Tidak")) return "status danger";
-      if (text.includes("Verifikasi")) return "status warning";
-      if (text.includes("Layak")) return "status success";
+      if (["Layak Diusulkan", "Layak", "Layak Diusulkan Setelah Verifikasi Manual"].includes(status)) return "status success";
+      if (["Perlu Verifikasi", "Perlu Verifikasi Lanjutan", "Menunggu Verifikasi Manual", "Menunggu Verifikasi Lanjutan"].includes(status)) return "status warning";
       return "status danger";
     }
 
@@ -777,8 +740,8 @@
       el("weightBox").innerHTML = weights.map(item => `
         <div class="weight-card">
           <div>
-            <h4>${item.code}</h4>
-            <p>${item.name}</p>
+            <h4>${escapeHtml(item.code)}</h4>
+            <p>${escapeHtml(item.name)}</p>
           </div>
           <span class="weight-value ${item.value < 0 ? "minus" : "plus"}">${item.value > 0 ? "+" : ""}${item.value}</span>
         </div>
@@ -789,29 +752,26 @@
       el("ruleBox").innerHTML = rules.map((rule, index) => `
         <div class="rule-card">
           <h4>R${index + 1}</h4>
-          <p>${rule}</p>
+          <p>${escapeHtml(rule)}</p>
         </div>
       `).join("");
     }
 
     function renderSummary() {
       el("totalData").textContent = results.length;
-      el("totalLayak").textContent = results.filter(item => getFinalResult(item).includes("Layak") && !getFinalResult(item).includes("Tidak")).length;
-      el("totalVerifikasi").textContent = results.filter(item => getFinalResult(item).includes("Verifikasi")).length;
-      el("totalTidak").textContent = results.filter(item => getFinalResult(item).includes("Tidak")).length;
+      el("totalLayak").textContent = results.filter(item => item.systemRecommendation === "Layak Diusulkan").length;
+      el("totalVerifikasi").textContent = results.filter(item => item.systemRecommendation === "Perlu Verifikasi").length;
+      el("totalBelumManual").textContent = results.filter(item => !item.manualRecommendation).length;
       el("btnExport").disabled = results.length === 0;
     }
 
     function renderPreview(item) {
       el("previewBox").classList.remove("hidden");
       el("previewContent").innerHTML = `
-        <p><strong>${item.nama}</strong> memperoleh skor <strong>${item.score}</strong>.</p>
-        <p>Rekomendasi sistem: <strong>${getSystemRecommendation(item)}</strong>.</p>
-        <p>Rekomendasi manual: <strong>${getManualRecommendation(item)}</strong>.</p>
-        <p>Keterangan petugas: ${getManualNote(item)}.</p>
-        <p>Hasil akhir: <strong>${getFinalResult(item)}</strong>.</p>
-        <p>Komponen: ${item.components}.</p>
-        <p>Rincian: ${item.details}.</p>
+        <p><strong>${escapeHtml(item.nama)}</strong> memperoleh skor <strong>${item.score}</strong>.</p>
+        <p>Rekomendasi Sistem: <span class="${statusClass(item.systemRecommendation)}">${escapeHtml(item.systemRecommendation)}</span></p>
+        <p>Komponen: ${escapeHtml(item.components)}.</p>
+        <p>Langkah berikutnya: buka halaman <strong>Hasil Rekomendasi</strong>, lalu klik <strong>Verifikasi Manual/Edit</strong> untuk mengisi rekomendasi manual dan keterangan petugas.</p>
       `;
     }
 
@@ -820,17 +780,17 @@
       const filter = el("filterStatus") ? el("filterStatus").value : "SEMUA";
 
       return results.filter(item => {
-        const matchQuery = [
+        const searchable = [
           item.nama,
           item.nik,
           item.rt,
-          getSystemRecommendation(item),
-          getManualRecommendation(item),
-          getManualNote(item),
-          getFinalResult(item)
-        ].join(" ").toLowerCase().includes(query);
-        const statusText = [getSystemRecommendation(item), getManualRecommendation(item), getFinalResult(item)].join(" ");
-        const matchStatus = filter === "SEMUA" || statusText.includes(filter);
+          item.systemRecommendation,
+          item.manualRecommendation || "Belum Diverifikasi",
+          item.officerNote,
+          item.finalResult
+        ].join(" ").toLowerCase();
+        const matchQuery = searchable.includes(query);
+        const matchStatus = filter === "SEMUA" || item.systemRecommendation === filter;
         return matchQuery && matchStatus;
       });
     }
@@ -839,27 +799,27 @@
       const filtered = getFilteredResults();
       el("searchCards").innerHTML = filtered.map(item => {
         const realIndex = results.indexOf(item);
+        const manualText = item.manualRecommendation || "Belum Diverifikasi";
         return `
           <article class="search-card">
             <div class="search-card-head">
               <div>
-                <h3>${item.nama}</h3>
-                <p>NIK: ${item.nik}</p>
-                <p>RT: ${item.rt} | Umur: ${item.umur} tahun</p>
+                <h3>${escapeHtml(item.nama)}</h3>
+                <p>NIK: ${escapeHtml(item.nik)}</p>
+                <p>RT: ${escapeHtml(item.rt)} | Umur: ${escapeHtml(item.umur)} tahun</p>
               </div>
-              <span class="${statusClass(getFinalResult(item))}">${getFinalResult(item)}</span>
+              <span class="${statusClass(item.systemRecommendation)}">${escapeHtml(item.systemRecommendation)}</span>
             </div>
             <div class="search-card-body">
               <p><strong>Skor:</strong> ${item.score}</p>
-              <p><strong>Komponen:</strong> ${item.components}</p>
-              <p><strong>Rekomendasi Sistem:</strong> <span class="${statusClass(getSystemRecommendation(item))}">${getSystemRecommendation(item)}</span></p>
-              <p><strong>Rekomendasi Manual:</strong> <span class="${statusClass(getManualRecommendation(item))}">${getManualRecommendation(item)}</span></p>
-              <p><strong>Keterangan:</strong> ${getManualNote(item)}</p>
-              <p><strong>Hasil Akhir:</strong> <span class="${statusClass(getFinalResult(item))}">${getFinalResult(item)}</span></p>
-              <p><strong>Rincian:</strong> ${item.details}</p>
+              <p><strong>Komponen:</strong> ${escapeHtml(item.components)}</p>
+              <p><strong>Rekomendasi Manual:</strong> <span class="${statusClass(manualText)}">${escapeHtml(manualText)}</span></p>
+              <p><strong>Keterangan:</strong> ${escapeHtml(item.officerNote || "Belum ada keterangan")}</p>
+              <p><strong>Hasil Akhir:</strong> <span class="${statusClass(item.finalResult)}">${escapeHtml(item.finalResult)}</span></p>
             </div>
             <div class="card-actions">
-              <button onclick="editData(${realIndex})" class="btn btn-warning">Edit</button>
+              <button onclick="openManualVerification(${realIndex})" class="btn btn-primary">Verifikasi Manual/Edit</button>
+              <button onclick="editData(${realIndex})" class="btn btn-warning">Edit Data</button>
               <button onclick="deleteData(${realIndex})" class="btn btn-danger">Hapus</button>
             </div>
           </article>
@@ -875,31 +835,36 @@
         lebih_2000: "> Rp2.000.000"
       };
 
-      el("resultBody").innerHTML = results.map((item, index) => `
-        <tr>
-          <td>${index + 1}</td>
-          <td>
-            <strong>${item.nama}</strong>
-            <small>Umur ${item.umur} tahun</small>
-            <small>Penghasilan ${labelFromValue(item.penghasilan, incomeLabels)}</small>
-          </td>
-          <td>${item.nik}</td>
-          <td>${item.rt}</td>
-          <td><strong>${item.score}</strong></td>
-          <td>${item.components}</td>
-          <td><span class="${statusClass(getSystemRecommendation(item))}">${getSystemRecommendation(item)}</span></td>
-          <td><span class="${statusClass(getManualRecommendation(item))}">${getManualRecommendation(item)}</span></td>
-          <td>${getManualNote(item)}<small>${item.officer || "Petugas"}</small></td>
-          <td><span class="${statusClass(getFinalResult(item))}">${getFinalResult(item)}</span></td>
-          <td>${item.details}</td>
-          <td>
-            <div class="table-actions">
-              <button onclick="editData(${index})" class="btn btn-warning">Edit</button>
-              <button onclick="deleteData(${index})" class="btn btn-danger">Hapus</button>
-            </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="12" class="empty-table">Belum ada data. Silakan input data warga.</td></tr>`;
+      el("resultBody").innerHTML = results.map((item, index) => {
+        const manualText = item.manualRecommendation || "Belum Diverifikasi";
+        const noteText = item.officerNote || "Belum ada keterangan";
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td>
+              <strong>${escapeHtml(item.nama)}</strong>
+              <small>Umur ${escapeHtml(item.umur)} tahun</small>
+              <small>Penghasilan ${escapeHtml(labelFromValue(item.penghasilan, incomeLabels))}</small>
+            </td>
+            <td>${escapeHtml(item.nik)}</td>
+            <td>${escapeHtml(item.rt)}</td>
+            <td><strong>${item.score}</strong></td>
+            <td>${escapeHtml(item.components)}</td>
+            <td><span class="${statusClass(item.systemRecommendation)}">${escapeHtml(item.systemRecommendation)}</span></td>
+            <td><span class="${statusClass(manualText)}">${escapeHtml(manualText)}</span></td>
+            <td>${escapeHtml(noteText)}</td>
+            <td><span class="${statusClass(item.finalResult)}">${escapeHtml(item.finalResult)}</span></td>
+            <td>${escapeHtml(item.details)}</td>
+            <td>
+              <div class="table-actions">
+                <button onclick="openManualVerification(${index})" class="btn btn-primary small-btn">Verifikasi Manual/Edit</button>
+                <button onclick="editData(${index})" class="btn btn-warning small-btn">Edit Data</button>
+                <button onclick="deleteData(${index})" class="btn btn-danger small-btn">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("") || `<tr><td colspan="12" class="empty-table">Belum ada data. Silakan input data warga.</td></tr>`;
     }
 
     function renderAll() {
@@ -917,22 +882,19 @@
         return;
       }
 
-      if (!data.manualRecommendation) {
-        alert("Rekomendasi manual wajib dipilih oleh petugas.");
-        return;
-      }
-
-      if (!data.manualNote) {
-        alert("Keterangan petugas wajib diisi agar hasil akhir dapat ditentukan.");
-        return;
-      }
-
       const result = infer(data);
 
       if (editIndex === null) {
         results.push(result);
       } else {
-        results[editIndex] = result;
+        results[editIndex] = {
+          ...result,
+          manualRecommendation: "",
+          officerNote: "",
+          finalResult: "Menunggu Verifikasi Manual",
+          verifiedBy: "",
+          verifiedAt: ""
+        };
       }
 
       saveLocal();
@@ -946,7 +908,7 @@
       const item = results[index];
       setFormData(item);
       editIndex = index;
-      el("formWarga").querySelector("button[type='submit']").textContent = "Update Data";
+      el("formWarga").querySelector("button[type='submit']").textContent = "Update Data & Hitung Ulang Rekomendasi Sistem";
       showPage("input");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -958,8 +920,89 @@
       renderAll();
     }
 
+    function openManualVerification(index) {
+      manualIndex = index;
+      const item = results[index];
+      el("manualRecommendation").value = item.manualRecommendation || "";
+      el("officerNote").value = item.officerNote || "";
+      el("manualSystemInfo").innerHTML = `
+        <div class="manual-info-grid">
+          <div>
+            <span>Nama Warga</span>
+            <strong>${escapeHtml(item.nama)}</strong>
+          </div>
+          <div>
+            <span>Skor Sistem</span>
+            <strong>${item.score}</strong>
+          </div>
+          <div>
+            <span>Rekomendasi Sistem</span>
+            <strong class="${statusClass(item.systemRecommendation)}">${escapeHtml(item.systemRecommendation)}</strong>
+          </div>
+          <div>
+            <span>Komponen</span>
+            <strong>${escapeHtml(item.components)}</strong>
+          </div>
+        </div>
+        <p><strong>Rincian Sistem:</strong> ${escapeHtml(item.details)}</p>
+      `;
+      el("manualModal").classList.remove("hidden");
+      el("manualRecommendation").focus();
+    }
+
+    function closeManualModal() {
+      manualIndex = null;
+      el("manualModal").classList.add("hidden");
+      el("manualForm").reset();
+    }
+
+    function saveManualVerification(event) {
+      event.preventDefault();
+      if (manualIndex === null) return;
+
+      const manualRecommendation = el("manualRecommendation").value;
+      const officerNote = el("officerNote").value.trim();
+
+      if (!manualRecommendation || !officerNote) {
+        alert("Rekomendasi manual dan keterangan wajib diisi.");
+        return;
+      }
+
+      results[manualIndex].manualRecommendation = manualRecommendation;
+      results[manualIndex].officerNote = officerNote;
+      results[manualIndex].verifiedBy = currentUser;
+      results[manualIndex].verifiedAt = new Date().toLocaleString("id-ID");
+      results[manualIndex].finalResult = getFinalResult(results[manualIndex]);
+
+      saveLocal();
+      renderAll();
+      closeManualModal();
+      showPage("result");
+    }
+
     function exportCsv() {
-      const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Kondisi Rumah", "Aset Produktif", "Kendaraan", "DTKS", "Komponen", "Skor", "Rekomendasi Sistem", "Rekomendasi Manual", "Keterangan Petugas", "Hasil Akhir", "Petugas", "Rincian Bobot"];
+      const headers = [
+        "No",
+        "Nama",
+        "NIK",
+        "RT",
+        "Umur",
+        "Penghasilan",
+        "Tanggungan",
+        "Kondisi Rumah",
+        "Aset Produktif",
+        "Kendaraan",
+        "DTKS",
+        "Komponen",
+        "Skor",
+        "Rekomendasi Sistem",
+        "Rekomendasi Manual",
+        "Keterangan Petugas",
+        "Hasil Akhir",
+        "Diverifikasi Oleh",
+        "Waktu Verifikasi",
+        "Rincian Bobot"
+      ];
       const incomeLabels = {
         kurang_800: "Kurang dari Rp800.000",
         "800_1000": "Rp800.000 sampai Rp1.000.000",
@@ -980,11 +1023,12 @@
         item.dtks === "terdaftar" ? "Terdaftar" : "Belum Terdaftar",
         item.components,
         item.score,
-        getSystemRecommendation(item),
-        getManualRecommendation(item),
-        getManualNote(item),
-        getFinalResult(item),
-        item.officer || "Petugas",
+        item.systemRecommendation,
+        item.manualRecommendation || "Belum Diverifikasi",
+        item.officerNote || "Belum ada keterangan",
+        item.finalResult,
+        item.verifiedBy || "-",
+        item.verifiedAt || "-",
         item.details
       ]);
 
@@ -996,7 +1040,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "hasil_rekomendasi_pkh_hasil_akhir.csv";
+      a.download = "hasil_rekomendasi_pkh_verifikasi_manual.csv";
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -1005,8 +1049,8 @@
       button.addEventListener("click", () => showPage(button.dataset.page));
     });
 
-    el("formLogin").addEventListener("submit", loginPetugas);
-    el("btnLogout").addEventListener("click", logoutPetugas);
+    el("loginForm").addEventListener("submit", login);
+    el("btnLogout").addEventListener("click", logout);
     el("btnMenu").addEventListener("click", toggleSidebar);
     el("overlay").addEventListener("click", closeSidebar);
     el("formWarga").addEventListener("submit", saveData);
@@ -1014,6 +1058,13 @@
     el("btnExport").addEventListener("click", exportCsv);
     el("searchInput").addEventListener("input", renderAll);
     el("filterStatus").addEventListener("change", renderAll);
+    el("btnCloseModal").addEventListener("click", closeManualModal);
+    el("btnCancelManual").addEventListener("click", closeManualModal);
+    el("manualForm").addEventListener("submit", saveManualVerification);
+
+    el("manualModal").addEventListener("click", event => {
+      if (event.target === el("manualModal")) closeManualModal();
+    });
 
     window.addEventListener("resize", () => {
       if (isDesktop()) {
@@ -1024,7 +1075,13 @@
 
     renderWeights();
     renderRules();
-    initAuth();
+    renderAll();
+
+    if (currentUser) {
+      showApp();
+    } else {
+      showLogin();
+    }
   </script>
 </body>
 </html>
