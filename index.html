@@ -1,799 +1,98 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aplikasi PKH Forward Chaining</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PKH Forward Chaining + Manual</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-shell">
-    <aside id="sidebar" class="sidebar">
-      <div class="brand">
-        <div class="brand-logo">KD</div>
-        <div>
-          <h1>Kantor Desa</h1>
-          <p>Sistem Rekomendasi PKH</p>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><h1>Kantor Desa</h1></div>
+    <nav>
+      <button data-page="dashboard" class="nav-btn active">Dashboard</button>
+      <button data-page="input" class="nav-btn">Input Data</button>
+      <button data-page="result" class="nav-btn">Hasil Rekomendasi</button>
+    </nav>
+    <div><button id="btnExport" class="btn btn-export" disabled>Export CSV</button></div>
+  </aside>
+
+  <div class="content-area">
+    <main class="main-content">
+      <section id="page-dashboard" class="page-section">
+        <h2>Dashboard</h2>
+        <p>Total data: <span id="totalData">0</span></p>
+      </section>
+
+      <section id="page-input" class="page-section hidden">
+        <form id="formWarga" class="panel">
+          <h3>Input Data Warga</h3>
+          <div class="form-group"><label>Nama</label><input id="nama" required></div>
+          <div class="form-group"><label>Skor Sistem</label><input id="skor" type="number" min="0" max="100" required></div>
+          <div class="form-group">
+            <label>Rekomendasi Manual</label>
+            <select id="manualRekomendasi">
+              <option value="">Biarkan sistem menentukan</option>
+              <option value="Layak Diusulkan">Layak Diusulkan</option>
+              <option value="Perlu Verifikasi">Perlu Verifikasi</option>
+              <option value="Tidak Prioritas">Tidak Prioritas</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Keterangan Manual</label><input id="manualKeterangan" placeholder="Alasan rekomendasi manual"></div>
+          <button type="submit" class="btn btn-primary">Simpan Data</button>
+        </form>
+      </section>
+
+      <section id="page-result" class="page-section hidden">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th><th>Nama</th><th>Skor</th><th>Rekomendasi Sistem</th>
+                <th>Rekomendasi Manual</th><th>Keterangan Manual</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+          </table>
         </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <button data-page="dashboard" class="nav-btn active">
-          <span class="nav-icon">🏠</span>
-          <span>Dashboard</span>
-        </button>
-        <button data-page="input" class="nav-btn">
-          <span class="nav-icon">📝</span>
-          <span>Input Data</span>
-        </button>
-        <button data-page="search" class="nav-btn">
-          <span class="nav-icon">🔎</span>
-          <span>Cari Data</span>
-        </button>
-        <button data-page="result" class="nav-btn">
-          <span class="nav-icon">📊</span>
-          <span>Hasil Rekomendasi</span>
-        </button>
-        <button data-page="weight" class="nav-btn">
-          <span class="nav-icon">⚖️</span>
-          <span>Bobot Penilaian</span>
-        </button>
-        <button data-page="rule" class="nav-btn">
-          <span class="nav-icon">🧠</span>
-          <span>Aturan Sistem</span>
-        </button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <button id="btnExport" class="btn btn-export" disabled>Export CSV</button>
-        <p>Rekomendasi awal. Verifikasi lapangan tetap diperlukan.</p>
-      </div>
-    </aside>
-
-    <div id="overlay" class="overlay"></div>
-
-    <div class="content-area">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button id="btnMenu" class="menu-btn" aria-label="Toggle sidebar">☰</button>
-          <div>
-            <h2 id="pageTitle">Dashboard</h2>
-            <p id="pageSubtitle">Informasi aplikasi rekomendasi PKH</p>
-          </div>
-        </div>
-        <div class="topbar-badge">Desa Digital</div>
-      </header>
-
-      <main class="main-content">
-        <section class="summary-grid">
-          <article class="summary-card">
-            <p>Total Data</p>
-            <h3 id="totalData">0</h3>
-          </article>
-          <article class="summary-card green">
-            <p>Layak Diusulkan</p>
-            <h3 id="totalLayak">0</h3>
-          </article>
-          <article class="summary-card yellow">
-            <p>Perlu Verifikasi</p>
-            <h3 id="totalVerifikasi">0</h3>
-          </article>
-          <article class="summary-card red">
-            <p>Tidak Prioritas</p>
-            <h3 id="totalTidak">0</h3>
-          </article>
-        </section>
-
-        <section id="page-dashboard" class="page-section">
-          <div class="hero-card">
-            <div class="hero-content">
-              <p class="section-label">Aplikasi Pelayanan Sosial Desa</p>
-              <h2>Rekomendasi Kelayakan Awal Penerima PKH</h2>
-              <p>Aplikasi ini membantu petugas desa memasukkan data warga, menghitung bobot prioritas, menjalankan metode forward chaining, dan menghasilkan rekomendasi awal calon penerima Program Keluarga Harapan.</p>
-              <div class="hero-actions">
-                <button data-page="input" class="btn btn-primary open-page">Mulai Input Data</button>
-                <button data-page="weight" class="btn btn-secondary open-page">Lihat Bobot</button>
-              </div>
-            </div>
-            <div class="hero-panel">
-              <h3>Informasi Sistem</h3>
-              <ul>
-                <li>Metode: Forward Chaining</li>
-                <li>Basis: Sistem Pakar AI Simbolik</li>
-                <li>Output: Skor dan Status Rekomendasi</li>
-                <li>Pengguna: Admin atau Petugas Desa</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="info-grid">
-            <article class="info-card">
-              <h3>Tujuan Aplikasi</h3>
-              <p>Membantu skrining awal calon penerima PKH secara lebih rapi, cepat, dan terarah.</p>
-            </article>
-            <article class="info-card">
-              <h3>Metode</h3>
-              <p>Forward chaining mencocokkan fakta warga dengan aturan sampai sistem menemukan rekomendasi.</p>
-            </article>
-            <article class="info-card">
-              <h3>Output</h3>
-              <p>Sistem menampilkan skor, komponen PKH, status rekomendasi, dan rincian bobot.</p>
-            </article>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Alur Penggunaan</h3>
-            </div>
-            <div class="step-grid">
-              <div class="step-card">
-                <span>1</span>
-                <h4>Input Data</h4>
-                <p>Petugas mengisi identitas dan kondisi sosial ekonomi warga.</p>
-              </div>
-              <div class="step-card">
-                <span>2</span>
-                <h4>Proses Aturan</h4>
-                <p>Sistem membaca fakta dan menjalankan aturan forward chaining.</p>
-              </div>
-              <div class="step-card">
-                <span>3</span>
-                <h4>Hitung Bobot</h4>
-                <p>Setiap kriteria mendapat skor sesuai tingkat prioritas.</p>
-              </div>
-              <div class="step-card">
-                <span>4</span>
-                <h4>Rekomendasi</h4>
-                <p>Sistem menampilkan status layak, verifikasi, atau tidak prioritas.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="page-input" class="page-section hidden">
-          <form id="formWarga" class="panel form-panel">
-            <div class="panel-header form-header">
-              <div>
-                <h3>Input Data Warga</h3>
-                <p>Isi data warga. Sistem akan menghitung bobot secara otomatis.</p>
-              </div>
-              <button id="btnResetForm" type="button" class="btn btn-muted">Reset Form</button>
-            </div>
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Nama Warga</label>
-                <input id="nama" type="text" required />
-              </div>
-              <div class="form-group">
-                <label>NIK</label>
-                <input id="nik" type="text" required />
-              </div>
-              <div class="form-group">
-                <label>RT</label>
-                <input id="rt" type="text" required />
-              </div>
-              <div class="form-group">
-                <label>Umur</label>
-                <input id="umur" type="number" min="0" required />
-              </div>
-              <div class="form-group">
-                <label>Penghasilan per Bulan</label>
-                <select id="penghasilan">
-                  <option value="kurang_800">Kurang dari Rp800.000</option>
-                  <option value="800_1000">Rp800.000 sampai Rp1.000.000</option>
-                  <option value="1000_2000">Di atas Rp1.000.000 sampai Rp2.000.000</option>
-                  <option value="lebih_2000">Di atas Rp2.000.000</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Jumlah Tanggungan Keluarga</label>
-                <input id="tanggungan" type="number" min="0" required />
-              </div>
-              <div class="form-group">
-                <label>Kondisi Rumah</label>
-                <select id="kondisiRumah">
-                  <option value="tidak_layak">Tidak Layak</option>
-                  <option value="layak">Layak</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Aset Produktif</label>
-                <select id="asetProduktif">
-                  <option value="tidak_ada">Tidak Ada</option>
-                  <option value="ada">Ada</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Kendaraan</label>
-                <select id="kendaraan">
-                  <option value="tidak_ada">Tidak Ada</option>
-                  <option value="sepeda">Sepeda</option>
-                  <option value="motor">Motor</option>
-                  <option value="mobil">Mobil</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Status DTKS</label>
-                <select id="dtks">
-                  <option value="terdaftar">Terdaftar</option>
-                  <option value="belum">Belum Terdaftar</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="component-box">
-              <h4>Komponen PKH</h4>
-              <div class="checkbox-grid">
-                <label><input id="ibuHamil" type="checkbox" /> Ibu hamil atau menyusui</label>
-                <label><input id="balita" type="checkbox" /> Anak usia 0 sampai 6 tahun</label>
-                <label><input id="anakSekolah" type="checkbox" /> Anak sekolah SD, SMP, atau SMA</label>
-                <label><input id="disabilitas" type="checkbox" /> Penyandang disabilitas berat</label>
-              </div>
-              <p>Komponen lansia dihitung otomatis jika umur minimal 60 tahun.</p>
-            </div>
-
-            <div id="previewBox" class="preview-box hidden">
-              <h4>Preview Hasil Input Terakhir</h4>
-              <div id="previewContent"></div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary">Simpan Data</button>
-              <button type="button" data-page="result" class="btn btn-dark open-page">Lihat Hasil</button>
-            </div>
-          </form>
-        </section>
-
-        <section id="page-search" class="page-section hidden">
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <h3>Cari Data Warga</h3>
-                <p>Cari berdasarkan nama, NIK, RT, atau status rekomendasi.</p>
-              </div>
-            </div>
-            <div class="search-grid">
-              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" />
-              <select id="filterStatus">
-                <option value="SEMUA">Semua Status</option>
-                <option value="Layak Diusulkan">Layak Diusulkan</option>
-                <option value="Perlu Verifikasi">Perlu Verifikasi</option>
-                <option value="Tidak Prioritas">Tidak Prioritas</option>
-              </select>
-            </div>
-          </div>
-          <div class="panel mt-20">
-            <div class="panel-header">
-              <h3>Hasil Pencarian</h3>
-            </div>
-            <div id="searchCards" class="search-cards"></div>
-          </div>
-        </section>
-
-        <section id="page-result" class="page-section hidden">
-          <div class="panel">
-            <div class="panel-header form-header">
-              <div>
-                <h3>Hasil Rekomendasi</h3>
-                <p>Tabel data warga dan hasil proses forward chaining.</p>
-              </div>
-              <button data-page="input" class="btn btn-primary open-page">Tambah Data</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>NIK</th>
-                    <th>RT</th>
-                    <th>Skor</th>
-                    <th>Komponen</th>
-                    <th>Rekomendasi</th>
-                    <th>Rincian Bobot</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="resultBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="page-weight" class="page-section hidden">
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <h3>Bobot Penilaian</h3>
-                <p>Bobot digunakan untuk menghitung skor prioritas setiap warga.</p>
-              </div>
-            </div>
-            <div id="weightBox" class="weight-grid"></div>
-          </div>
-        </section>
-
-        <section id="page-rule" class="page-section hidden">
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <h3>Aturan Forward Chaining</h3>
-                <p>Sistem membaca fakta, menambahkan bobot, lalu menentukan rekomendasi.</p>
-              </div>
-            </div>
-            <div id="ruleBox" class="rule-grid"></div>
-          </div>
-
-          <div class="panel mt-20">
-            <div class="panel-header">
-              <h3>Aturan Keputusan</h3>
-            </div>
-            <div class="decision-grid">
-              <div class="decision-card success">
-                <h4>Layak Diusulkan</h4>
-                <p>Skor minimal 70, terdaftar DTKS, dan memiliki minimal satu komponen PKH.</p>
-              </div>
-              <div class="decision-card warning">
-                <h4>Perlu Verifikasi</h4>
-                <p>Skor 50 sampai 69, atau data potensial tetapi DTKS belum terdaftar.</p>
-              </div>
-              <div class="decision-card danger">
-                <h4>Tidak Prioritas</h4>
-                <p>Skor di bawah 50, tidak memiliki komponen PKH, atau ada indikator ekonomi kuat.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
+      </section>
+    </main>
   </div>
+</div>
 
-  <script>
-    const weights = [
-      { code: "B1", name: "Penghasilan kurang dari Rp800.000", value: 25 },
-      { code: "B2", name: "Penghasilan Rp800.000 sampai Rp1.000.000", value: 20 },
-      { code: "B3", name: "Rumah tidak layak", value: 20 },
-      { code: "B4", name: "Tanggungan keluarga 4 orang atau lebih", value: 15 },
-      { code: "B5", name: "Tanggungan keluarga 3 orang", value: 10 },
-      { code: "B6", name: "Tidak memiliki aset produktif", value: 15 },
-      { code: "B7", name: "Tidak memiliki kendaraan atau hanya sepeda", value: 10 },
-      { code: "B8", name: "Terdaftar DTKS", value: 10 },
-      { code: "B9", name: "Memiliki komponen PKH", value: 20 },
-      { code: "B10", name: "Indikator ekonomi kuat: mobil, rumah layak, dan penghasilan tinggi", value: -30 }
-    ];
+<script>
+const results=[];
+const form = document.getElementById("formWarga");
+form.addEventListener("submit", e=>{
+  e.preventDefault();
+  const nama = document.getElementById("nama").value;
+  const skor = Number(document.getElementById("skor").value);
+  const rekomManual = document.getElementById("manualRekomendasi").value || "Belum ada";
+  const ketManual = document.getElementById("manualKeterangan").value || "-";
+  let rekomSistem="Tidak Prioritas";
+  if(skor>=70) rekomSistem="Layak Diusulkan";
+  else if(skor>=50) rekomSistem="Perlu Verifikasi";
+  results.push({nama, skor, rekomSistem, rekomManual, ketManual});
+  renderTable();
+  form.reset();
+});
 
-    const rules = [
-      "IF penghasilan kurang dari Rp800.000 THEN bobot ekonomi sangat rentan +25",
-      "IF penghasilan Rp800.000 sampai Rp1.000.000 THEN bobot ekonomi rentan +20",
-      "IF rumah tidak layak THEN bobot kondisi hunian +20",
-      "IF tanggungan keluarga minimal 4 orang THEN bobot beban keluarga +15",
-      "IF tidak memiliki aset produktif THEN bobot kepemilikan aset +15",
-      "IF tidak memiliki kendaraan atau hanya sepeda THEN bobot akses kendaraan +10",
-      "IF terdaftar DTKS THEN bobot validasi data +10",
-      "IF memiliki komponen PKH THEN bobot komponen bantuan +20",
-      "IF mobil AND rumah layak AND penghasilan tinggi THEN bobot ekonomi kuat -30",
-      "IF skor >= 70 AND DTKS terdaftar AND komponen PKH ada THEN layak diusulkan"
-    ];
-
-    const pageInfo = {
-      dashboard: ["Dashboard", "Informasi aplikasi rekomendasi PKH"],
-      input: ["Input Data", "Masukkan data warga secara manual"],
-      search: ["Cari Data", "Temukan data warga yang sudah diinput"],
-      result: ["Hasil Rekomendasi", "Lihat hasil perhitungan forward chaining"],
-      weight: ["Bobot Penilaian", "Daftar bobot setiap kriteria"],
-      rule: ["Aturan Sistem", "Basis aturan forward chaining"]
-    };
-
-    let results = JSON.parse(localStorage.getItem("pkhResults")) || [];
-    let editIndex = null;
-    let currentPage = "dashboard";
-
-    const el = id => document.getElementById(id);
-
-    function saveLocal() {
-      localStorage.setItem("pkhResults", JSON.stringify(results));
-    }
-
-    function labelFromValue(value, map) {
-      return map[value] || value;
-    }
-
-    function isDesktop() {
-      return window.innerWidth >= 1024;
-    }
-
-    function closeSidebar() {
-      const sidebar = el("sidebar");
-      if (isDesktop()) {
-        sidebar.classList.add("collapsed");
-      } else {
-        sidebar.classList.remove("open");
-        el("overlay").classList.remove("show");
-      }
-    }
-
-    function openSidebar() {
-      const sidebar = el("sidebar");
-      if (isDesktop()) {
-        sidebar.classList.remove("collapsed");
-      } else {
-        sidebar.classList.add("open");
-        el("overlay").classList.add("show");
-      }
-    }
-
-    function toggleSidebar() {
-      const sidebar = el("sidebar");
-      if (isDesktop()) {
-        sidebar.classList.toggle("collapsed");
-      } else {
-        sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
-      }
-    }
-
-    function showPage(page) {
-      currentPage = page;
-      document.querySelectorAll(".page-section").forEach(section => section.classList.add("hidden"));
-      el(`page-${page}`).classList.remove("hidden");
-
-      document.querySelectorAll(".nav-btn").forEach(button => {
-        button.classList.toggle("active", button.dataset.page === page);
-      });
-
-      el("pageTitle").textContent = pageInfo[page][0];
-      el("pageSubtitle").textContent = pageInfo[page][1];
-
-      if (!isDesktop()) closeSidebar();
-      renderAll();
-    }
-
-    function getFormData() {
-      return {
-        nama: el("nama").value.trim(),
-        nik: el("nik").value.trim(),
-        rt: el("rt").value.trim(),
-        umur: Number(el("umur").value || 0),
-        penghasilan: el("penghasilan").value,
-        tanggungan: Number(el("tanggungan").value || 0),
-        kondisiRumah: el("kondisiRumah").value,
-        asetProduktif: el("asetProduktif").value,
-        kendaraan: el("kendaraan").value,
-        dtks: el("dtks").value,
-        ibuHamil: el("ibuHamil").checked,
-        balita: el("balita").checked,
-        anakSekolah: el("anakSekolah").checked,
-        disabilitas: el("disabilitas").checked
-      };
-    }
-
-    function setFormData(data) {
-      el("nama").value = data.nama;
-      el("nik").value = data.nik;
-      el("rt").value = data.rt;
-      el("umur").value = data.umur;
-      el("penghasilan").value = data.penghasilan;
-      el("tanggungan").value = data.tanggungan;
-      el("kondisiRumah").value = data.kondisiRumah;
-      el("asetProduktif").value = data.asetProduktif;
-      el("kendaraan").value = data.kendaraan;
-      el("dtks").value = data.dtks;
-      el("ibuHamil").checked = data.ibuHamil;
-      el("balita").checked = data.balita;
-      el("anakSekolah").checked = data.anakSekolah;
-      el("disabilitas").checked = data.disabilitas;
-    }
-
-    function resetForm() {
-      el("formWarga").reset();
-      editIndex = null;
-      el("formWarga").querySelector("button[type='submit']").textContent = "Simpan Data";
-    }
-
-    function infer(data) {
-      let score = 0;
-      const details = [];
-      const components = [];
-
-      if (data.penghasilan === "kurang_800") {
-        score += 25;
-        details.push("Penghasilan kurang dari Rp800.000: +25");
-      } else if (data.penghasilan === "800_1000") {
-        score += 20;
-        details.push("Penghasilan Rp800.000 sampai Rp1.000.000: +20");
-      }
-
-      if (data.kondisiRumah === "tidak_layak") {
-        score += 20;
-        details.push("Rumah tidak layak: +20");
-      }
-
-      if (data.tanggungan >= 4) {
-        score += 15;
-        details.push("Tanggungan 4 orang atau lebih: +15");
-      } else if (data.tanggungan === 3) {
-        score += 10;
-        details.push("Tanggungan 3 orang: +10");
-      }
-
-      if (data.asetProduktif === "tidak_ada") {
-        score += 15;
-        details.push("Tidak memiliki aset produktif: +15");
-      }
-
-      if (data.kendaraan === "tidak_ada" || data.kendaraan === "sepeda") {
-        score += 10;
-        details.push("Kendaraan terbatas: +10");
-      }
-
-      if (data.dtks === "terdaftar") {
-        score += 10;
-        details.push("Terdaftar DTKS: +10");
-      } else {
-        details.push("Belum terdaftar DTKS: +0 dan perlu verifikasi");
-      }
-
-      if (data.ibuHamil) components.push("Ibu hamil atau menyusui");
-      if (data.balita) components.push("Anak usia 0 sampai 6 tahun");
-      if (data.anakSekolah) components.push("Anak sekolah");
-      if (data.umur >= 60) components.push("Lansia");
-      if (data.disabilitas) components.push("Disabilitas berat");
-
-      const hasComponent = components.length > 0;
-
-      if (hasComponent) {
-        score += 20;
-        details.push("Memiliki komponen PKH: +20");
-      } else {
-        details.push("Belum memiliki komponen PKH: +0");
-      }
-
-      if (data.kendaraan === "mobil" && data.kondisiRumah === "layak" && data.penghasilan === "lebih_2000") {
-        score -= 30;
-        details.push("Indikator ekonomi kuat: -30");
-      }
-
-      score = Math.max(0, Math.min(100, score));
-
-      let recommendation = "Tidak Prioritas";
-      if (score >= 70 && hasComponent && data.dtks === "terdaftar") {
-        recommendation = "Layak Diusulkan";
-      } else if (score >= 50 || (hasComponent && data.dtks === "belum")) {
-        recommendation = "Perlu Verifikasi";
-      }
-
-      return {
-        ...data,
-        score,
-        components: hasComponent ? components.join(", ") : "Belum ada komponen PKH",
-        recommendation,
-        details: details.join("; ")
-      };
-    }
-
-    function statusClass(status) {
-      if (status === "Layak Diusulkan") return "status success";
-      if (status === "Perlu Verifikasi") return "status warning";
-      return "status danger";
-    }
-
-    function renderWeights() {
-      el("weightBox").innerHTML = weights.map(item => `
-        <div class="weight-card">
-          <div>
-            <h4>${item.code}</h4>
-            <p>${item.name}</p>
-          </div>
-          <span class="weight-value ${item.value < 0 ? "minus" : "plus"}">${item.value > 0 ? "+" : ""}${item.value}</span>
-        </div>
-      `).join("");
-    }
-
-    function renderRules() {
-      el("ruleBox").innerHTML = rules.map((rule, index) => `
-        <div class="rule-card">
-          <h4>R${index + 1}</h4>
-          <p>${rule}</p>
-        </div>
-      `).join("");
-    }
-
-    function renderSummary() {
-      el("totalData").textContent = results.length;
-      el("totalLayak").textContent = results.filter(item => item.recommendation === "Layak Diusulkan").length;
-      el("totalVerifikasi").textContent = results.filter(item => item.recommendation === "Perlu Verifikasi").length;
-      el("totalTidak").textContent = results.filter(item => item.recommendation === "Tidak Prioritas").length;
-      el("btnExport").disabled = results.length === 0;
-    }
-
-    function renderPreview(item) {
-      el("previewBox").classList.remove("hidden");
-      el("previewContent").innerHTML = `
-        <p><strong>${item.nama}</strong> memperoleh skor <strong>${item.score}</strong>.</p>
-        <p>Status rekomendasi: <strong>${item.recommendation}</strong>.</p>
-        <p>Komponen: ${item.components}.</p>
-        <p>Rincian: ${item.details}.</p>
-      `;
-    }
-
-    function getFilteredResults() {
-      const query = el("searchInput") ? el("searchInput").value.toLowerCase() : "";
-      const filter = el("filterStatus") ? el("filterStatus").value : "SEMUA";
-
-      return results.filter(item => {
-        const matchQuery = [item.nama, item.nik, item.rt, item.recommendation].join(" ").toLowerCase().includes(query);
-        const matchStatus = filter === "SEMUA" || item.recommendation === filter;
-        return matchQuery && matchStatus;
-      });
-    }
-
-    function renderSearchCards() {
-      const filtered = getFilteredResults();
-      el("searchCards").innerHTML = filtered.map(item => {
-        const realIndex = results.indexOf(item);
-        return `
-          <article class="search-card">
-            <div class="search-card-head">
-              <div>
-                <h3>${item.nama}</h3>
-                <p>NIK: ${item.nik}</p>
-                <p>RT: ${item.rt} | Umur: ${item.umur} tahun</p>
-              </div>
-              <span class="${statusClass(item.recommendation)}">${item.recommendation}</span>
-            </div>
-            <div class="search-card-body">
-              <p><strong>Skor:</strong> ${item.score}</p>
-              <p><strong>Komponen:</strong> ${item.components}</p>
-              <p><strong>Rincian:</strong> ${item.details}</p>
-            </div>
-            <div class="card-actions">
-              <button onclick="editData(${realIndex})" class="btn btn-warning">Edit</button>
-              <button onclick="deleteData(${realIndex})" class="btn btn-danger">Hapus</button>
-            </div>
-          </article>
-        `;
-      }).join("") || `<div class="empty-state">Data tidak ditemukan.</div>`;
-    }
-
-    function renderTable() {
-      const incomeLabels = {
-        kurang_800: "< Rp800.000",
-        "800_1000": "Rp800.000 sampai Rp1.000.000",
-        "1000_2000": "> Rp1.000.000 sampai Rp2.000.000",
-        lebih_2000: "> Rp2.000.000"
-      };
-
-      el("resultBody").innerHTML = results.map((item, index) => `
-        <tr>
-          <td>${index + 1}</td>
-          <td>
-            <strong>${item.nama}</strong>
-            <small>Umur ${item.umur} tahun</small>
-            <small>Penghasilan ${labelFromValue(item.penghasilan, incomeLabels)}</small>
-          </td>
-          <td>${item.nik}</td>
-          <td>${item.rt}</td>
-          <td><strong>${item.score}</strong></td>
-          <td>${item.components}</td>
-          <td><span class="${statusClass(item.recommendation)}">${item.recommendation}</span></td>
-          <td>${item.details}</td>
-          <td>
-            <div class="table-actions">
-              <button onclick="editData(${index})" class="btn btn-warning">Edit</button>
-              <button onclick="deleteData(${index})" class="btn btn-danger">Hapus</button>
-            </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="9" class="empty-table">Belum ada data. Silakan input data warga.</td></tr>`;
-    }
-
-    function renderAll() {
-      renderSummary();
-      renderTable();
-      renderSearchCards();
-    }
-
-    function saveData(event) {
-      event.preventDefault();
-      const data = getFormData();
-
-      if (!data.nama || !data.nik || !data.rt || data.umur <= 0) {
-        alert("Nama, NIK, RT, dan umur wajib diisi.");
-        return;
-      }
-
-      const result = infer(data);
-
-      if (editIndex === null) {
-        results.push(result);
-      } else {
-        results[editIndex] = result;
-      }
-
-      saveLocal();
-      renderPreview(result);
-      renderAll();
-      resetForm();
-      showPage("result");
-    }
-
-    function editData(index) {
-      const item = results[index];
-      setFormData(item);
-      editIndex = index;
-      el("formWarga").querySelector("button[type='submit']").textContent = "Update Data";
-      showPage("input");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function deleteData(index) {
-      if (!confirm("Hapus data ini?")) return;
-      results.splice(index, 1);
-      saveLocal();
-      renderAll();
-    }
-
-    function exportCsv() {
-      const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Kondisi Rumah", "Aset Produktif", "Kendaraan", "DTKS", "Komponen", "Skor", "Rekomendasi", "Rincian Bobot"];
-      const incomeLabels = {
-        kurang_800: "Kurang dari Rp800.000",
-        "800_1000": "Rp800.000 sampai Rp1.000.000",
-        "1000_2000": "Di atas Rp1.000.000 sampai Rp2.000.000",
-        lebih_2000: "Di atas Rp2.000.000"
-      };
-      const rows = results.map((item, index) => [
-        index + 1,
-        item.nama,
-        item.nik,
-        item.rt,
-        item.umur,
-        incomeLabels[item.penghasilan],
-        item.tanggungan,
-        item.kondisiRumah === "tidak_layak" ? "Tidak Layak" : "Layak",
-        item.asetProduktif === "tidak_ada" ? "Tidak Ada" : "Ada",
-        item.kendaraan,
-        item.dtks === "terdaftar" ? "Terdaftar" : "Belum Terdaftar",
-        item.components,
-        item.score,
-        item.recommendation,
-        item.details
-      ]);
-
-      const csv = [headers, ...rows]
-        .map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(","))
-        .join("\n");
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "hasil_rekomendasi_pkh_manual.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    document.querySelectorAll(".nav-btn, .open-page").forEach(button => {
-      button.addEventListener("click", () => showPage(button.dataset.page));
-    });
-
-    el("btnMenu").addEventListener("click", toggleSidebar);
-    el("overlay").addEventListener("click", closeSidebar);
-    el("formWarga").addEventListener("submit", saveData);
-    el("btnResetForm").addEventListener("click", resetForm);
-    el("btnExport").addEventListener("click", exportCsv);
-    el("searchInput").addEventListener("input", renderAll);
-    el("filterStatus").addEventListener("change", renderAll);
-
-    window.addEventListener("resize", () => {
-      if (isDesktop()) {
-        el("overlay").classList.remove("show");
-        el("sidebar").classList.remove("open");
-      }
-    });
-
-    renderWeights();
-    renderRules();
-    renderAll();
-    showPage("dashboard");
-  </script>
+function renderTable(){
+  const tbody = document.getElementById("resultBody");
+  tbody.innerHTML = results.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.nama}</td>
+      <td>${r.skor}</td>
+      <td>${r.rekomSistem}</td>
+      <td>${r.rekomManual}</td>
+      <td>${r.ketManual}</td>
+    </tr>
+  `).join("");
+  document.getElementById("totalData").textContent = results.length;
+}
+</script>
 </body>
 </html>
