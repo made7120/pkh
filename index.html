@@ -11,59 +11,40 @@
 <div class="app-shell">
   <!-- Sidebar -->
   <aside id="sidebar" class="sidebar">
-    <div class="brand">
-      <div class="brand-logo">KD</div>
-      <div>
-        <h1>Kantor Desa</h1>
-        <p>Sistem Rekomendasi PKH</p>
-      </div>
-    </div>
+    <div class="brand"><div class="brand-logo">KD</div><div><h1>Kantor Desa</h1><p>Sistem Rekomendasi PKH</p></div></div>
     <nav class="sidebar-nav">
       <button data-page="dashboard" class="nav-btn active">Dashboard</button>
       <button data-page="input" class="nav-btn">Input Data</button>
       <button data-page="result" class="nav-btn">Hasil Rekomendasi</button>
-      <button data-page="weight" class="nav-btn">Bobot</button>
-      <button data-page="rule" class="nav-btn">Aturan</button>
     </nav>
     <div class="sidebar-footer">
       <button id="btnExport" class="btn btn-export" disabled>Export CSV</button>
     </div>
   </aside>
 
-  <!-- Konten utama -->
   <div class="content-area">
     <main class="main-content">
-
       <!-- Dashboard -->
       <section id="page-dashboard" class="page-section">
         <div class="summary-grid">
-          <article class="summary-card">
-            <p>Total Data</p>
-            <h3 id="totalData">0</h3>
-          </article>
-          <article class="summary-card green">
-            <p>Layak Diusulkan</p>
-            <h3 id="totalLayak">0</h3>
-          </article>
-          <article class="summary-card yellow">
-            <p>Perlu Verifikasi</p>
-            <h3 id="totalVerifikasi">0</h3>
-          </article>
-          <article class="summary-card red">
-            <p>Tidak Prioritas</p>
-            <h3 id="totalTidak">0</h3>
-          </article>
+          <article class="summary-card"><p>Total Data</p><h3 id="totalData">0</h3></article>
+          <article class="summary-card green"><p>Layak Diusulkan</p><h3 id="totalLayak">0</h3></article>
+          <article class="summary-card yellow"><p>Perlu Verifikasi</p><h3 id="totalVerifikasi">0</h3></article>
+          <article class="summary-card red"><p>Tidak Prioritas</p><h3 id="totalTidak">0</h3></article>
         </div>
       </section>
 
       <!-- Input Data -->
       <section id="page-input" class="page-section hidden">
-        <form id="formWarga" class="panel">
-          <h3>Input Data Warga</h3>
+        <form id="formWarga" class="panel form-panel">
+          <div class="panel-header form-header">
+            <div><h3>Input Data Warga</h3><p>Isi data warga. Sistem akan menghitung bobot dan rekomendasi.</p></div>
+          </div>
           <div class="form-grid">
             <div class="form-group"><label>Nama</label><input id="nama" required></div>
-            <div class="form-group"><label>Umur</label><input id="umur" type="number" min="0" required></div>
+            <div class="form-group"><label>NIK</label><input id="nik" required></div>
             <div class="form-group"><label>RT</label><input id="rt" required></div>
+            <div class="form-group"><label>Umur</label><input id="umur" type="number" min="0" required></div>
             <div class="form-group"><label>Penghasilan</label>
               <select id="penghasilan">
                 <option value="kurang_800">Kurang dari Rp800.000</option>
@@ -72,28 +53,23 @@
                 <option value="lebih_2000">Di atas Rp2.000.000</option>
               </select>
             </div>
-            <div class="form-group"><label>Tanggungan Keluarga</label><input id="tanggungan" type="number" min="0" required></div>
-            <div class="form-group"><label>Kondisi Rumah</label>
-              <select id="kondisiRumah"><option value="tidak_layak">Tidak Layak</option><option value="layak">Layak</option></select>
-            </div>
-            <div class="form-group"><label>Aset Produktif</label>
-              <select id="asetProduktif"><option value="tidak_ada">Tidak Ada</option><option value="ada">Ada</option></select>
-            </div>
-            <div class="form-group"><label>Kendaraan</label>
-              <select id="kendaraan">
-                <option value="tidak_ada">Tidak Ada</option>
-                <option value="sepeda">Sepeda</option>
-                <option value="motor">Motor</option>
-                <option value="mobil">Mobil</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Status DTKS</label>
-              <select id="dtks"><option value="terdaftar">Terdaftar</option><option value="belum">Belum Terdaftar</option></select>
+            <div class="form-group"><label>Tanggungan</label><input id="tanggungan" type="number" min="0" required></div>
+            <div class="form-group"><label>Kondisi Rumah</label><select id="kondisiRumah"><option value="tidak_layak">Tidak Layak</option><option value="layak">Layak</option></select></div>
+            <div class="form-group"><label>Aset Produktif</label><select id="asetProduktif"><option value="tidak_ada">Tidak Ada</option><option value="ada">Ada</option></select></div>
+            <div class="form-group"><label>Kendaraan</label><select id="kendaraan"><option value="tidak_ada">Tidak Ada</option><option value="sepeda">Sepeda</option><option value="motor">Motor</option><option value="mobil">Mobil</option></select></div>
+            <div class="form-group"><label>Status DTKS</label><select id="dtks"><option value="terdaftar">Terdaftar</option><option value="belum">Belum Terdaftar</option></select></div>
+
+            <!-- Komponen PKH -->
+            <div class="component-box">
+              <h4>Komponen PKH</h4>
+              <label><input id="ibuHamil" type="checkbox"> Ibu Hamil/Menyusui</label>
+              <label><input id="balita" type="checkbox"> Anak 0-6 tahun</label>
+              <label><input id="anakSekolah" type="checkbox"> Anak Sekolah</label>
+              <label><input id="disabilitas" type="checkbox"> Disabilitas</label>
             </div>
 
             <!-- Rekomendasi Manual -->
-            <div class="form-group">
-              <label>Rekomendasi Manual</label>
+            <div class="form-group"><label>Rekomendasi Manual</label>
               <select id="manualRekomendasi">
                 <option value="">Biarkan sistem menentukan</option>
                 <option value="Layak Diusulkan">Layak Diusulkan</option>
@@ -103,24 +79,26 @@
             </div>
             <div class="form-group"><label>Keterangan Manual</label><input id="manualKeterangan" placeholder="Alasan rekomendasi manual"></div>
           </div>
+
           <button type="submit" class="btn btn-primary">Simpan Data</button>
         </form>
       </section>
 
-      <!-- Hasil Rekomendasi -->
+      <!-- Hasil -->
       <section id="page-result" class="page-section hidden">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>No</th><th>Nama</th><th>Skor</th>
-                <th>Rekomendasi Sistem</th>
-                <th>Rekomendasi Manual</th>
-                <th>Keterangan Manual</th>
-              </tr>
-            </thead>
-            <tbody id="resultBody"></tbody>
-          </table>
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th><th>Nama</th><th>NIK</th><th>RT</th><th>Skor</th>
+                  <th>Komponen</th><th>Rekomendasi Sistem</th><th>Rekomendasi Manual</th>
+                  <th>Keterangan Manual</th><th>Rincian Bobot</th>
+                </tr>
+              </thead>
+              <tbody id="resultBody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -130,69 +108,98 @@
 
 <script>
 const results=[];
+const el=id=>document.getElementById(id);
 
 function getFormData(){
   return {
-    nama: document.getElementById("nama").value,
-    umur: Number(document.getElementById("umur").value),
-    rt: document.getElementById("rt").value,
-    penghasilan: document.getElementById("penghasilan").value,
-    tanggungan: Number(document.getElementById("tanggungan").value),
-    kondisiRumah: document.getElementById("kondisiRumah").value,
-    asetProduktif: document.getElementById("asetProduktif").value,
-    kendaraan: document.getElementById("kendaraan").value,
-    dtks: document.getElementById("dtks").value,
-    manualRekomendasi: document.getElementById("manualRekomendasi").value||"Belum ada",
-    manualKeterangan: document.getElementById("manualKeterangan").value||"-"
+    nama: el("nama").value.trim(),
+    nik: el("nik").value.trim(),
+    rt: el("rt").value.trim(),
+    umur: Number(el("umur").value),
+    penghasilan: el("penghasilan").value,
+    tanggungan: Number(el("tanggungan").value),
+    kondisiRumah: el("kondisiRumah").value,
+    asetProduktif: el("asetProduktif").value,
+    kendaraan: el("kendaraan").value,
+    dtks: el("dtks").value,
+    ibuHamil: el("ibuHamil").checked,
+    balita: el("balita").checked,
+    anakSekolah: el("anakSekolah").checked,
+    disabilitas: el("disabilitas").checked,
+    manualRekom: el("manualRekomendasi").value || "Belum ada",
+    manualKeterangan: el("manualKeterangan").value || "-"
   };
 }
 
-// Forward chaining sederhana
-function computeRecommendation(data){
+// Forward chaining
+function infer(data){
   let score=0;
-  const details=[];
-  if(data.penghasilan==="kurang_800") {score+=25;}
-  else if(data.penghasilan==="800_1000") {score+=20;}
-  if(data.kondisiRumah==="tidak_layak") {score+=20;}
-  if(data.tanggungan>=4) {score+=15;} else if(data.tanggungan===3){score+=10;}
-  if(data.asetProduktif==="tidak_ada") {score+=15;}
-  if(data.kendaraan==="tidak_ada"||data.kendaraan==="sepeda") {score+=10;}
-  if(data.dtks==="terdaftar") {score+=10;}
-  if(data.umur>=60) {score+=10;}
-  score=Math.min(100,score);
+  const components=[];
+  if(data.penghasilan==="kurang_800") score+=25;
+  else if(data.penghasilan==="800_1000") score+=20;
+  if(data.kondisiRumah==="tidak_layak") score+=20;
+  if(data.tanggungan>=4) score+=15;
+  else if(data.tanggungan===3) score+=10;
+  if(data.asetProduktif==="tidak_ada") score+=15;
+  if(data.kendaraan==="tidak_ada"||data.kendaraan==="sepeda") score+=10;
+  if(data.dtks==="terdaftar") score+=10;
+  if(data.ibuHamil||data.balita||data.anakSekolah||data.disabilitas) score+=20;
+  if(data.umur>=60) score+=10;
+  data.score=score;
   let rekom="Tidak Prioritas";
   if(score>=70) rekom="Layak Diusulkan";
   else if(score>=50) rekom="Perlu Verifikasi";
-  data.skor=score;
   data.rekomSistem=rekom;
+  data.components=[
+    data.ibuHamil?"Ibu Hamil":"",
+    data.balita?"Balita":"",
+    data.anakSekolah?"Anak Sekolah":"",
+    data.disabilitas?"Disabilitas":"",
+    data.umur>=60?"Lansia":""
+  ].filter(x=>x).join(", ") || "Belum ada";
+  data.details=`Skor dihitung otomatis berdasarkan bobot input`;
   return data;
 }
 
-// Submit form
-document.getElementById("formWarga").addEventListener("submit",e=>{
+el("formWarga").addEventListener("submit", e=>{
   e.preventDefault();
   let data=getFormData();
-  data=computeRecommendation(data);
+  data=infer(data);
   results.push(data);
   renderTable();
+  el("btnExport").disabled=false;
   e.target.reset();
 });
 
 function renderTable(){
-  const tbody=document.getElementById("resultBody");
-  tbody.innerHTML=results.map((r,i)=>`
+  el("resultBody").innerHTML=results.map((r,i)=>`
     <tr>
       <td>${i+1}</td>
       <td>${r.nama}</td>
-      <td>${r.skor}</td>
+      <td>${r.nik}</td>
+      <td>${r.rt}</td>
+      <td>${r.score}</td>
+      <td>${r.components}</td>
       <td>${r.rekomSistem}</td>
-      <td>${r.manualRekomendasi}</td>
+      <td>${r.manualRekom}</td>
       <td>${r.manualKeterangan}</td>
+      <td>${r.details}</td>
     </tr>
   `).join("");
-  document.getElementById("totalData").textContent=results.length;
+  el("totalData").textContent=results.length;
 }
-</script>
 
+// Export CSV
+el("btnExport").addEventListener("click", ()=>{
+  const headers=["No","Nama","NIK","RT","Skor","Komponen","Rekomendasi Sistem","Rekomendasi Manual","Keterangan Manual","Rincian Bobot"];
+  const rows=results.map((r,i)=>[i+1,r.nama,r.nik,r.rt,r.score,r.components,r.rekomSistem,r.manualRekom,r.manualKeterangan,r.details]);
+  const csv=[headers,...rows].map(r=>r.map(v=>`"${v}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="hasil_rekomendasi.csv";a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
 </body>
 </html>
