@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aplikasi PKH Forward Chaining</title>
+  <title>Aplikasi PKH Forward Chaining - Hasil Akhir</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,7 +19,7 @@
 
       <form id="formLogin" class="login-form">
         <h2>Login Petugas</h2>
-        <p>Masuk sebagai petugas atau admin untuk menginput data dan memberikan rekomendasi manual.</p>
+        <p>Masuk sebagai petugas atau admin untuk menginput data, melihat rekomendasi sistem, mengisi rekomendasi manual, dan menghasilkan keputusan akhir.</p>
 
         <div class="form-group">
           <label>Username</label>
@@ -83,7 +83,7 @@
 
       <div class="sidebar-footer">
         <button id="btnExport" class="btn btn-export" disabled>Export CSV</button>
-        <p>Rekomendasi sistem dapat divalidasi manual oleh petugas desa.</p>
+        <p>Rekomendasi sistem divalidasi manual sampai keluar hasil akhir.</p>
       </div>
     </aside>
 
@@ -112,15 +112,15 @@
             <h3 id="totalData">0</h3>
           </article>
           <article class="summary-card green">
-            <p>Layak Diusulkan</p>
+            <p>Hasil Akhir Layak</p>
             <h3 id="totalLayak">0</h3>
           </article>
           <article class="summary-card yellow">
-            <p>Perlu Verifikasi</p>
+            <p>Menunggu Verifikasi</p>
             <h3 id="totalVerifikasi">0</h3>
           </article>
           <article class="summary-card red">
-            <p>Tidak Prioritas</p>
+            <p>Hasil Akhir Tidak Layak</p>
             <h3 id="totalTidak">0</h3>
           </article>
         </section>
@@ -141,7 +141,7 @@
               <ul>
                 <li>Metode: Forward Chaining</li>
                 <li>Basis: Sistem Pakar AI Simbolik</li>
-                <li>Output: Skor, Rekomendasi Sistem, dan Rekomendasi Manual</li>
+                <li>Output: Skor, Rekomendasi Sistem, Rekomendasi Manual, Keterangan, dan Hasil Akhir</li>
                 <li>Pengguna: Admin atau Petugas Desa</li>
               </ul>
             </div>
@@ -158,7 +158,7 @@
             </article>
             <article class="info-card">
               <h3>Output</h3>
-              <p>Sistem menampilkan skor, komponen PKH, status rekomendasi, dan rincian bobot.</p>
+              <p>Sistem menampilkan skor, komponen PKH, rekomendasi sistem, rekomendasi manual, keterangan petugas, hasil akhir, dan rincian bobot.</p>
             </article>
           </div>
 
@@ -184,8 +184,8 @@
               </div>
               <div class="step-card">
                 <span>4</span>
-                <h4>Rekomendasi</h4>
-                <p>Sistem menampilkan status layak, verifikasi, atau tidak prioritas.</p>
+                <h4>Hasil Akhir</h4>
+                <p>Petugas memberi rekomendasi manual dan keterangan, lalu sistem menampilkan hasil akhir.</p>
               </div>
             </div>
           </div>
@@ -280,19 +280,19 @@
               <div class="form-grid manual-grid">
                 <div class="form-group">
                   <label>Rekomendasi Manual</label>
-                  <select id="manualRecommendation">
-                    <option value="Ikuti Rekomendasi Sistem">Ikuti Rekomendasi Sistem</option>
-                    <option value="Layak Diusulkan">Layak Diusulkan</option>
-                    <option value="Perlu Verifikasi">Perlu Verifikasi</option>
-                    <option value="Tidak Prioritas">Tidak Prioritas</option>
+                  <select id="manualRecommendation" required>
+                    <option value="">Pilih rekomendasi manual</option>
+                    <option value="Layak">Layak</option>
+                    <option value="Tidak Layak">Tidak Layak</option>
+                    <option value="Perlu Verifikasi Lanjutan">Perlu Verifikasi Lanjutan</option>
                   </select>
                 </div>
                 <div class="form-group form-group-wide">
                   <label>Keterangan Petugas</label>
-                  <textarea id="manualNote" rows="3" placeholder="Contoh: Kondisi rumah sesuai, data penghasilan perlu dicek ulang, atau hasil lapangan berbeda dengan sistem."></textarea>
+                  <textarea id="manualNote" rows="3" required placeholder="Contoh: DTKS belum terdaftar, tetapi memiliki anak sekolah sehingga perlu pengecekan lapangan."></textarea>
                 </div>
               </div>
-              <p>Jika rekomendasi manual berbeda dari rekomendasi sistem, keterangan wajib diisi sebagai alasan keputusan petugas.</p>
+              <p>Rekomendasi manual dan keterangan wajib diisi agar sistem dapat memunculkan hasil akhir.</p>
             </div>
 
             <div id="previewBox" class="preview-box hidden">
@@ -316,12 +316,12 @@
               </div>
             </div>
             <div class="search-grid">
-              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT" />
+              <input id="searchInput" type="text" placeholder="Cari nama, NIK, RT, rekomendasi, atau hasil akhir" />
               <select id="filterStatus">
                 <option value="SEMUA">Semua Status</option>
-                <option value="Layak Diusulkan">Layak Diusulkan</option>
-                <option value="Perlu Verifikasi">Perlu Verifikasi</option>
-                <option value="Tidak Prioritas">Tidak Prioritas</option>
+                <option value="Layak">Layak / Layak Diusulkan</option>
+                <option value="Verifikasi">Perlu / Menunggu Verifikasi</option>
+                <option value="Tidak">Tidak Layak / Tidak Prioritas</option>
               </select>
             </div>
           </div>
@@ -338,7 +338,7 @@
             <div class="panel-header form-header">
               <div>
                 <h3>Hasil Rekomendasi</h3>
-                <p>Tabel data warga dan hasil proses forward chaining.</p>
+                <p>Tabel data warga, rekomendasi sistem, rekomendasi manual, keterangan, dan hasil akhir.</p>
               </div>
               <button data-page="input" class="btn btn-primary open-page">Tambah Data</button>
             </div>
@@ -355,6 +355,7 @@
                     <th>Rekomendasi Sistem</th>
                     <th>Rekomendasi Manual</th>
                     <th>Keterangan</th>
+                    <th>Hasil Akhir</th>
                     <th>Rincian Bobot</th>
                     <th>Aksi</th>
                   </tr>
@@ -407,6 +408,27 @@
               </div>
             </div>
           </div>
+
+          <div class="panel mt-20">
+            <div class="panel-header">
+              <h3>Aturan Hasil Akhir</h3>
+              <p>Hasil akhir ditentukan dari rekomendasi manual petugas dan keterangan verifikasi.</p>
+            </div>
+            <div class="decision-grid">
+              <div class="decision-card success">
+                <h4>Manual Layak</h4>
+                <p>Hasil akhir menjadi Layak Diusulkan Setelah Verifikasi Manual.</p>
+              </div>
+              <div class="decision-card warning">
+                <h4>Manual Perlu Verifikasi Lanjutan</h4>
+                <p>Hasil akhir menjadi Menunggu Verifikasi Lanjutan.</p>
+              </div>
+              <div class="decision-card danger">
+                <h4>Manual Tidak Layak</h4>
+                <p>Hasil akhir menjadi Tidak Layak Diusulkan.</p>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>
@@ -441,9 +463,9 @@
 
     const pageInfo = {
       dashboard: ["Dashboard", "Informasi aplikasi rekomendasi PKH"],
-      input: ["Input Data", "Masukkan data warga secara manual"],
+      input: ["Input Data", "Masukkan data warga dan validasi manual"],
       search: ["Cari Data", "Temukan data warga yang sudah diinput"],
-      result: ["Hasil Rekomendasi", "Lihat hasil perhitungan forward chaining"],
+      result: ["Hasil Rekomendasi", "Lihat rekomendasi sistem, manual, dan hasil akhir"],
       weight: ["Bobot Penilaian", "Daftar bobot setiap kriteria"],
       rule: ["Aturan Sistem", "Basis aturan forward chaining"]
     };
@@ -517,12 +539,36 @@
       return item.systemRecommendation || item.recommendation || "Tidak Prioritas";
     }
 
+    function normalizeManualRecommendation(value) {
+      if (!value || value === "Ikuti Rekomendasi Sistem") return "Belum Diisi";
+      if (value === "Layak Diusulkan") return "Layak";
+      if (value === "Tidak Prioritas") return "Tidak Layak";
+      if (value === "Perlu Verifikasi") return "Perlu Verifikasi Lanjutan";
+      return value;
+    }
+
     function getManualRecommendation(item) {
-      return item.manualRecommendation || getSystemRecommendation(item);
+      return normalizeManualRecommendation(item.manualRecommendation);
     }
 
     function getManualNote(item) {
       return item.manualNote && item.manualNote.trim() ? item.manualNote : "-";
+    }
+
+    function determineFinalResult(manualRecommendation, systemRecommendation) {
+      const manual = normalizeManualRecommendation(manualRecommendation);
+
+      if (manual === "Layak") return "Layak Diusulkan Setelah Verifikasi Manual";
+      if (manual === "Tidak Layak") return "Tidak Layak Diusulkan";
+      if (manual === "Perlu Verifikasi Lanjutan") return "Menunggu Verifikasi Lanjutan";
+
+      if (systemRecommendation === "Layak Diusulkan") return "Layak Diusulkan Berdasarkan Sistem";
+      if (systemRecommendation === "Perlu Verifikasi") return "Menunggu Verifikasi Lapangan";
+      return "Tidak Layak Diusulkan";
+    }
+
+    function getFinalResult(item) {
+      return item.finalResult || determineFinalResult(item.manualRecommendation, getSystemRecommendation(item));
     }
 
     function saveLocal() {
@@ -618,7 +664,8 @@
       el("balita").checked = data.balita;
       el("anakSekolah").checked = data.anakSekolah;
       el("disabilitas").checked = data.disabilitas;
-      el("manualRecommendation").value = data.manualRecommendation || "Ikuti Rekomendasi Sistem";
+      const manualValue = normalizeManualRecommendation(data.manualRecommendation);
+      el("manualRecommendation").value = manualValue === "Belum Diisi" ? "" : manualValue;
       el("manualNote").value = data.manualNote || "";
     }
 
@@ -701,9 +748,8 @@
       }
 
       const systemRecommendation = recommendation;
-      const manualRecommendation = data.manualRecommendation === "Ikuti Rekomendasi Sistem"
-        ? systemRecommendation
-        : data.manualRecommendation;
+      const manualRecommendation = data.manualRecommendation;
+      const finalResult = determineFinalResult(manualRecommendation, systemRecommendation);
 
       return {
         ...data,
@@ -713,14 +759,17 @@
         recommendation: systemRecommendation,
         manualRecommendation,
         manualNote: data.manualNote || "-",
+        finalResult,
         officer: loggedInUser ? `${loggedInUser.role} (${loggedInUser.username})` : "Petugas",
         details: details.join("; ")
       };
     }
 
     function statusClass(status) {
-      if (status === "Layak Diusulkan") return "status success";
-      if (status === "Perlu Verifikasi") return "status warning";
+      const text = String(status || "");
+      if (text.includes("Tidak")) return "status danger";
+      if (text.includes("Verifikasi")) return "status warning";
+      if (text.includes("Layak")) return "status success";
       return "status danger";
     }
 
@@ -747,9 +796,9 @@
 
     function renderSummary() {
       el("totalData").textContent = results.length;
-      el("totalLayak").textContent = results.filter(item => getSystemRecommendation(item) === "Layak Diusulkan").length;
-      el("totalVerifikasi").textContent = results.filter(item => getSystemRecommendation(item) === "Perlu Verifikasi").length;
-      el("totalTidak").textContent = results.filter(item => getSystemRecommendation(item) === "Tidak Prioritas").length;
+      el("totalLayak").textContent = results.filter(item => getFinalResult(item).includes("Layak") && !getFinalResult(item).includes("Tidak")).length;
+      el("totalVerifikasi").textContent = results.filter(item => getFinalResult(item).includes("Verifikasi")).length;
+      el("totalTidak").textContent = results.filter(item => getFinalResult(item).includes("Tidak")).length;
       el("btnExport").disabled = results.length === 0;
     }
 
@@ -760,6 +809,7 @@
         <p>Rekomendasi sistem: <strong>${getSystemRecommendation(item)}</strong>.</p>
         <p>Rekomendasi manual: <strong>${getManualRecommendation(item)}</strong>.</p>
         <p>Keterangan petugas: ${getManualNote(item)}.</p>
+        <p>Hasil akhir: <strong>${getFinalResult(item)}</strong>.</p>
         <p>Komponen: ${item.components}.</p>
         <p>Rincian: ${item.details}.</p>
       `;
@@ -776,9 +826,11 @@
           item.rt,
           getSystemRecommendation(item),
           getManualRecommendation(item),
-          getManualNote(item)
+          getManualNote(item),
+          getFinalResult(item)
         ].join(" ").toLowerCase().includes(query);
-        const matchStatus = filter === "SEMUA" || getSystemRecommendation(item) === filter || getManualRecommendation(item) === filter;
+        const statusText = [getSystemRecommendation(item), getManualRecommendation(item), getFinalResult(item)].join(" ");
+        const matchStatus = filter === "SEMUA" || statusText.includes(filter);
         return matchQuery && matchStatus;
       });
     }
@@ -795,13 +847,15 @@
                 <p>NIK: ${item.nik}</p>
                 <p>RT: ${item.rt} | Umur: ${item.umur} tahun</p>
               </div>
-              <span class="${statusClass(getSystemRecommendation(item))}">${getSystemRecommendation(item)}</span>
+              <span class="${statusClass(getFinalResult(item))}">${getFinalResult(item)}</span>
             </div>
             <div class="search-card-body">
               <p><strong>Skor:</strong> ${item.score}</p>
               <p><strong>Komponen:</strong> ${item.components}</p>
+              <p><strong>Rekomendasi Sistem:</strong> <span class="${statusClass(getSystemRecommendation(item))}">${getSystemRecommendation(item)}</span></p>
               <p><strong>Rekomendasi Manual:</strong> <span class="${statusClass(getManualRecommendation(item))}">${getManualRecommendation(item)}</span></p>
               <p><strong>Keterangan:</strong> ${getManualNote(item)}</p>
+              <p><strong>Hasil Akhir:</strong> <span class="${statusClass(getFinalResult(item))}">${getFinalResult(item)}</span></p>
               <p><strong>Rincian:</strong> ${item.details}</p>
             </div>
             <div class="card-actions">
@@ -836,6 +890,7 @@
           <td><span class="${statusClass(getSystemRecommendation(item))}">${getSystemRecommendation(item)}</span></td>
           <td><span class="${statusClass(getManualRecommendation(item))}">${getManualRecommendation(item)}</span></td>
           <td>${getManualNote(item)}<small>${item.officer || "Petugas"}</small></td>
+          <td><span class="${statusClass(getFinalResult(item))}">${getFinalResult(item)}</span></td>
           <td>${item.details}</td>
           <td>
             <div class="table-actions">
@@ -844,7 +899,7 @@
             </div>
           </td>
         </tr>
-      `).join("") || `<tr><td colspan="11" class="empty-table">Belum ada data. Silakan input data warga.</td></tr>`;
+      `).join("") || `<tr><td colspan="12" class="empty-table">Belum ada data. Silakan input data warga.</td></tr>`;
     }
 
     function renderAll() {
@@ -862,14 +917,17 @@
         return;
       }
 
-      const result = infer(data);
-
-      if (data.manualRecommendation !== "Ikuti Rekomendasi Sistem" &&
-          data.manualRecommendation !== result.systemRecommendation &&
-          !data.manualNote) {
-        alert("Keterangan petugas wajib diisi jika rekomendasi manual berbeda dari rekomendasi sistem.");
+      if (!data.manualRecommendation) {
+        alert("Rekomendasi manual wajib dipilih oleh petugas.");
         return;
       }
+
+      if (!data.manualNote) {
+        alert("Keterangan petugas wajib diisi agar hasil akhir dapat ditentukan.");
+        return;
+      }
+
+      const result = infer(data);
 
       if (editIndex === null) {
         results.push(result);
@@ -901,7 +959,7 @@
     }
 
     function exportCsv() {
-      const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Kondisi Rumah", "Aset Produktif", "Kendaraan", "DTKS", "Komponen", "Skor", "Rekomendasi Sistem", "Rekomendasi Manual", "Keterangan Petugas", "Petugas", "Rincian Bobot"];
+      const headers = ["No", "Nama", "NIK", "RT", "Umur", "Penghasilan", "Tanggungan", "Kondisi Rumah", "Aset Produktif", "Kendaraan", "DTKS", "Komponen", "Skor", "Rekomendasi Sistem", "Rekomendasi Manual", "Keterangan Petugas", "Hasil Akhir", "Petugas", "Rincian Bobot"];
       const incomeLabels = {
         kurang_800: "Kurang dari Rp800.000",
         "800_1000": "Rp800.000 sampai Rp1.000.000",
@@ -925,6 +983,7 @@
         getSystemRecommendation(item),
         getManualRecommendation(item),
         getManualNote(item),
+        getFinalResult(item),
         item.officer || "Petugas",
         item.details
       ]);
@@ -937,7 +996,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "hasil_rekomendasi_pkh_manual.csv";
+      a.download = "hasil_rekomendasi_pkh_hasil_akhir.csv";
       a.click();
       URL.revokeObjectURL(url);
     }
