@@ -779,7 +779,7 @@ body {
 
 table {
   width: 100%;
-  min-width: 1050px;
+  min-width: 1250px;
   border-collapse: collapse;
   background: var(--white);
 }
