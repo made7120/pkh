@@ -1083,5 +1083,40 @@
       showLogin();
     }
   </script>
+  <div id="manualModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h3>Verifikasi Manual Petugas</h3>
+        <p>Isi bagian ini setelah rekomendasi sistem muncul.</p>
+      </div>
+      <button id="btnCloseModal" class="modal-close" type="button">×</button>
+    </div>
+
+    <div id="manualSystemInfo" class="manual-system-info"></div>
+
+    <form id="manualForm" class="manual-form">
+      <div class="form-group">
+        <label>Rekomendasi Manual</label>
+        <select id="manualRecommendation" required>
+          <option value="">Pilih rekomendasi manual</option>
+          <option value="Layak">Layak</option>
+          <option value="Tidak Layak">Tidak Layak</option>
+          <option value="Perlu Verifikasi Lanjutan">Perlu Verifikasi Lanjutan</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Keterangan Petugas</label>
+        <textarea id="officerNote" rows="5" placeholder="Contoh: DTKS belum terdaftar, tetapi memiliki anak sekolah dan perlu pengecekan lapangan." required></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="btnCancelManual" class="btn btn-muted">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan Verifikasi Manual</button>
+      </div>
+    </form>
+  </div>
+</div>
 </body>
 </html>
