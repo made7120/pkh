@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Aplikasi PKH Forward Chaining</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<section id="loginPage" class="login-page">
+    <div class="login-card">
+      <div class="login-logo">KD</div>
+      <h1>Login Sistem</h1>
+      <p>Petugas khusus menginput data warga, sedangkan admin melakukan verifikasi manual rekomendasi PKH.</p>
+
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input id="username" type="text" placeholder="petugas" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input id="password" type="password" placeholder="pkh123" required />
+        </div>
+        <button type="submit" class="btn btn-primary full-width">Masuk</button>
+      </form>
+
+      <div class="login-info">
+        <strong>Akun Demo</strong>
+        <span>petugas / pkh123</span>
+        <span>admin / admin123</span>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/auth.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

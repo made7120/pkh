@@ -1,82 +1,66 @@
-# Aplikasi PKH Forward Chaining
+# Aplikasi PKH Forward Chaining dengan Database Supabase
 
-PANDUAN STRUKTUR FILE APLIKASI PKH
-===================================
+Aplikasi ini adalah sistem rekomendasi awal kelayakan penerima PKH berbasis metode forward chaining. Versi ini sudah diperbaiki agar hasil input warga tidak lagi disimpan di `localStorage`, tetapi disimpan ke database online Supabase.
 
-File sudah dipisah agar mudah dijelaskan saat sidang skripsi.
+## Teknologi yang Digunakan
 
-0. index.html
-   - File pembuka otomatis yang mengarahkan ke login.html.
+- HTML untuk struktur halaman.
+- CSS untuk tampilan aplikasi.
+- JavaScript untuk logika aplikasi, role pengguna, pencarian, render tabel, export CSV, dan komunikasi dengan database.
+- Supabase sebagai database online berbasis PostgreSQL.
+- GitHub sebagai penyimpanan kode.
+- Vercel sebagai tempat publish aplikasi.
 
-1. login.html
-   - Halaman login aplikasi.
-   - Berisi form login untuk petugas dan admin.
-   - Setelah login berhasil, pengguna diarahkan ke app.html.
+## Alur Penyimpanan Data
 
-2. app.html
-   - Halaman utama setelah login.
-   - Berisi dashboard, input data, pencarian, hasil rekomendasi, bobot, aturan sistem, dan modal verifikasi.
-   - Tampilan menu dibatasi sesuai role pengguna.
+Sebelumnya, data warga disimpan di browser memakai `localStorage`. Pada versi ini, alurnya berubah menjadi:
 
-3. css/style.css
-   - Mengatur seluruh tampilan aplikasi.
-   - Dipisahkan agar HTML lebih bersih dan mudah dibaca.
+```text
+Form input warga → JavaScript → Supabase Client → Database Supabase → Data tampil di halaman hasil
+```
 
-4. js/auth.js
-   - Mengatur akun demo, proses login, logout, dan hak akses role.
-   - Role petugas dapat membuka Dashboard, Input Data, dan Hasil Rekomendasi dalam mode read-only.
-   - Role admin dapat membuka Dashboard, Cari Data, Hasil Rekomendasi, Bobot Penilaian, dan Aturan Sistem.
+Artinya, ketika petugas mengisi data warga dan menekan tombol simpan, sistem tetap menjalankan proses forward chaining di `js/rekomendasi.js`. Setelah skor dan rekomendasi sistem muncul, data tersebut dikirim oleh `js/app.js` ke tabel `warga_pkh` di Supabase.
 
-5. js/login.js
-   - Mengatur aksi tombol login pada login.html.
-   - Jika username dan password benar, pengguna masuk ke app.html.
+Admin kemudian dapat membuka data yang sudah masuk, melakukan verifikasi manual, mengisi keterangan, dan menyimpan hasil akhir. Perubahan tersebut juga disimpan kembali ke database Supabase.
 
-6. js/data.js
-   - Berisi bobot penilaian, aturan forward chaining, dan informasi halaman.
-   - Bagian ini bisa dijelaskan sebagai basis pengetahuan sistem.
+## File Penting
 
-7. js/rekomendasi.js
-   - Berisi fungsi inferensi forward chaining.
-   - Data warga diubah menjadi fakta, lalu sistem menghitung skor dan menentukan rekomendasi sistem.
+```text
+index.html                  Halaman pembuka yang mengarah ke login.html
+login.html                  Halaman login demo petugas dan admin
+app.html                    Halaman utama aplikasi
+css/style.css               Tampilan aplikasi
+js/auth.js                  Login demo dan pembagian role
+js/login.js                 Proses login
+js/data.js                  Bobot, aturan, dan informasi halaman
+js/rekomendasi.js           Proses inferensi forward chaining
+js/supabase-config.js       Konfigurasi URL dan publishable key Supabase
+js/app.js                   Interaksi aplikasi dan koneksi database Supabase
+supabase-setup.sql          SQL untuk membuat tabel database dan RLS policy
+```
 
-8. js/app.js
-   - Mengatur fungsi aplikasi utama.
-   - Contoh: simpan data warga, tampilkan hasil, cari data, verifikasi manual admin, export CSV.
+## Cara Menyiapkan Database
 
-ALUR ROLE
-=========
+1. Masuk ke Supabase Dashboard.
+2. Buka project yang digunakan.
+3. Masuk ke menu SQL Editor.
+4. Jalankan isi file `supabase-setup.sql`.
+5. Pastikan tabel `warga_pkh` berhasil dibuat.
+6. Pastikan file `js/supabase-config.js` berisi URL dan publishable key project Supabase yang benar.
 
-Petugas:
-- Login menggunakan petugas / pkh123.
-- Petugas menginput data warga dan melihat hasil secara read-only.
-- Setelah data disimpan, sistem otomatis menghasilkan rekomendasi awal.
-- Petugas tidak bisa melakukan verifikasi manual.
+## Akun Demo
 
-Admin:
-- Login menggunakan admin / admin123.
-- Admin melihat data yang sudah diinput petugas.
-- Admin mengisi rekomendasi manual dan keterangan.
-- Setelah admin menyimpan verifikasi, sistem menampilkan hasil akhir.
+```text
+petugas / pkh123
+admin / admin123
+```
 
-KALIMAT PENJELASAN SAAT SIDANG
-==============================
+Catatan: login pada versi ini masih login demo di sisi frontend. Database digunakan untuk menyimpan data warga, hasil rekomendasi sistem, verifikasi manual, dan hasil akhir. Untuk aplikasi produksi, login sebaiknya dipindahkan ke Supabase Auth atau backend yang lebih aman.
 
-"Pada revisi ini, program saya pisahkan menjadi beberapa file agar struktur aplikasi lebih jelas. Halaman login dibuat sendiri di login.html, halaman utama ada di app.html, tampilan ada di css/style.css, sedangkan fungsi JavaScript dipisah berdasarkan tugasnya. File auth.js mengatur login dan hak akses, data.js berisi bobot serta aturan, rekomendasi.js berisi proses forward chaining, dan app.js mengatur interaksi aplikasi. Dengan pemisahan ini, petugas bertugas menginput data warga dan melihat hasil rekomendasi secara read-only, sedangkan admin bertugas melakukan verifikasi manual dan menentukan hasil akhir."
+## Penjelasan Singkat untuk Sidang
 
+Pada versi ini, aplikasi tidak lagi menyimpan data input warga ke penyimpanan lokal browser. Data yang diinput oleh petugas dikirim ke database online Supabase melalui JavaScript Supabase Client. Setelah data warga diproses oleh metode forward chaining, hasil skor, rekomendasi sistem, komponen PKH, dan rincian bobot disimpan ke tabel `warga_pkh`. Admin dapat membaca data tersebut dari database, melakukan verifikasi manual, mengisi keterangan, dan memperbarui hasil akhir. Dengan demikian, penyimpanan data menjadi lebih terpusat dan tidak bergantung pada satu browser saja.
 
-HAK AKSES FINAL
-================
+## Catatan Keamanan
 
-Petugas:
-- Bisa input data warga.
-- Bisa melihat Hasil Rekomendasi.
-- Tidak bisa klik Verifikasi Manual/Edit.
-- Tidak bisa menghapus data.
-- Tidak bisa export CSV.
-
-Admin:
-- Bisa melihat semua data.
-- Bisa melakukan Verifikasi Manual/Edit.
-- Bisa mengisi keterangan admin.
-- Bisa menentukan hasil akhir.
-- Bisa export CSV.
+RLS policy pada file SQL ini dibuat longgar untuk kebutuhan demo skripsi agar aplikasi frontend dapat membaca, menyimpan, dan memperbarui data. Jangan gunakan NIK atau data warga asli pada hosting publik. Untuk penggunaan nyata, sistem harus memakai autentikasi yang lebih kuat dan policy database yang membatasi akses berdasarkan user dan role.
